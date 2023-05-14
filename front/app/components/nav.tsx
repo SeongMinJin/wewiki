@@ -10,7 +10,7 @@ export default function Nav() {
 	return (
 		<nav className="w-full relative my-8 h-[40px] flex justify-between">
 			<div className="w-auto flex items-center font-abril-fatface tracking-widest text-[140%] opacity-70">
-				<a href="">jelog</a>
+				<a href="">weWiki</a>
 			</div>
 			<div className="w-auto relative flex items-center font-noto">
 				{
@@ -53,11 +53,11 @@ export default function Nav() {
 
 function Drawer() {
 	return (
-		<div className="absolute w-screen max-w-[12rem] place-self-stretch top-[100%] right-0">
+		<div className="absolute w-64 place-self-stretch top-[100%] right-0">
 			<ul className="relative shadow-2xl border mt-4 bg-white z-10">
-				<li className="hover:bg-red-50 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><Link href="/my">내 젤로그</Link></li>
-				<li className="hover:bg-red-50 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><Link href="/temp">임시 글</Link></li>
-				<li className="hover:bg-red-50 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><><button>로그아웃</button></></li>
+				<li className="hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><Link href="/my">내 위키</Link></li>
+				<li className="hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><Link href="/temp">임시 글</Link></li>
+				<li className="hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><><button>로그아웃</button></></li>
 			</ul>
 		</div>
 	)
