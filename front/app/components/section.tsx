@@ -102,7 +102,7 @@ function Post({
 			/>
 			<div className="p-3">
 				<div>
-					<h4 className="text-[100%] font-medium">{title}</h4>
+					<h4 className="text-[100%] font-medium line-clamp-1">{title}</h4>
 					<p className="text-[80%] line-clamp-3 opacity-70 text-ellipsis leading-5 min-h-[3.75rem]">{content}</p>
 				</div>
 				<div>
