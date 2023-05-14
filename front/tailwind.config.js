@@ -13,6 +13,16 @@ module.exports = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
+    screens: {
+      'phone': '640px',
+      'tablet': '1024px',
+      'laptop': '1440px',
+      'desktop': '1920px',
+    },
+    fontFamily: {
+      'noto': '\'Noto Sans KR\', sans-serif',
+      'abril-fatface': '\'Abril Fatface\', cursive'
+    }
   },
   plugins: [],
 }
