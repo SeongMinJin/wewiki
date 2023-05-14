@@ -88,10 +88,10 @@ function Post({
 	author: string,
 }) {
 	return (
-		<div className="font-noto shadow hover:-translate-y-3 rounded duration-500 cursor-pointer">
+		<div className="w-full font-noto shadow hover:-translate-y-3 rounded duration-500 cursor-pointer">
 			<Image
 				src={path}
-				width={600}
+				width={1000}
 				height={600}
 				style={{
 					objectFit: 'cover',
@@ -100,23 +100,23 @@ function Post({
 				className="rounded-t"
 				alt="Image of Thumbnail"
 			/>
-			<div className="p-3">
+			<div className="w-full p-3 flex-grow flex-shrink">
 				<div>
 					<h4 className="text-[100%] font-medium line-clamp-1">{title}</h4>
-					<p className="text-[80%] line-clamp-3 opacity-70 text-ellipsis leading-5 min-h-[3.75rem]">{content}</p>
+					<p className="text-[80%] line-clamp-3 opacity-70 leading-5 min-h-[3.75rem]">{content}</p>
 				</div>
 				<div>
-					<p className="text-[80%] opacity-50">{date.getFullYear()}년 {date.getMonth()}월 {date.getDate()}일</p>
+					<p className="line-clamp-1 text-[80%] opacity-50">{date.getFullYear()}년 {date.getMonth()}월 {date.getDate()}일</p>
 				</div>
 			</div>
-			<div className="p-4 border-t flex gap-x-2 items-center">
+			<div className="w-full px-4 py-2 border-t flex gap-x-2 items-center">
 				<Image
 				src="/건빵.png"
 				width={25}
 				height={25}
 				alt="Image of author's avatar"
 				/>
-				<p className="text-[80%]">
+				<p className="text-[0.75rem]">
 					<span className="opacity-50">by&nbsp;</span>
 					{author}
 				</p>
