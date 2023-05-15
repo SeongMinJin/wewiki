@@ -10,7 +10,7 @@ export default function Nav() {
 	return (
 		<nav className="w-full relative my-8 h-[40px] flex justify-between">
 			<div className="w-auto flex items-center font-abril-fatface tracking-widest text-[140%] opacity-70">
-				<a href="">weWiki</a>
+				<a href="">wilog</a>
 			</div>
 			<div className="w-auto relative flex items-center font-noto">
 				{
