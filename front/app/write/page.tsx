@@ -12,8 +12,8 @@ export default function Write() {
 						Tool Box
 					</div>
 				</div>
-					{/* 글 작성 부분 */}
-					<Note />
+				{/* 글 작성 부분 */}
+				<Note />
 
 				<div className="absolute w-full h-fit left-0 bottom-0 z-10 flex justify-between shadow-2xl shadow-black font-noto text-lg px-4 py-4">
 					<button className="py-2 px-4 hover:bg-gray-100 rounded-md">
