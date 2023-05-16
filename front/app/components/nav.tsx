@@ -10,7 +10,7 @@ export default function Nav() {
 	return (
 		<nav className="w-full relative my-8 h-[40px] flex justify-between">
 			<div className="w-auto flex items-center font-abril-fatface tracking-widest text-[140%] opacity-70">
-				<a href="">wilog</a>
+				<a href="">weWiki</a>
 			</div>
 			<div className="w-auto relative flex items-center font-noto">
 				{
@@ -32,9 +32,7 @@ export default function Nav() {
 										}}
 										className="rounded-full shadow-lg"
 									/>
-									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 group-hover/avatar:stroke-2 duration-300">
-										<path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-									</svg>
+									<span className="text-lg text-opacity-70 group-hover/avatar:text-red-300 duration-300">▾</span>
 								</div>
 							</div>
 							<Fab />
