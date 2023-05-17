@@ -32,7 +32,7 @@ export default function Nav() {
 										}}
 										className="rounded-full shadow-lg"
 									/>
-									<span className="text-lg text-opacity-70 group-hover/avatar:text-red-300 duration-300">▾</span>
+									<span className="opacity-50 group-hover/avatar:opacity-100 duration-300">▾</span>
 								</div>
 							</div>
 							<Fab />
