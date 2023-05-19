@@ -63,6 +63,7 @@ export default function Note() {
 								e.preventDefault();
 
 								const [match] = Editor.nodes(editor, {
+									// @ts-ignore
 									match: (n: Node) => n.highlight
 								});
 
@@ -75,6 +76,7 @@ export default function Note() {
 							}
 							case 'b': {
 								const [match] = Editor.nodes(editor, {
+									// @ts-ignore
 									match: (n: Node) => n.bold
 								});
 
