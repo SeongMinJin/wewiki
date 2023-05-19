@@ -5,13 +5,14 @@ export default function Write() {
 	return (
 		<form className="relative w-screen min-w-[350px] h-screen flex" action="">
 			<div className="relative w-full h-full phone:pt-8 phone:px-12 pb-20 flex flex-col">
-				<input className="w-full font-noto font-semibold p-4 text-[250%] focus:outline-none" type="text" placeholder="제목을 입력하세요" />
+				<input autoFocus className="w-full font-noto font-semibold p-4 text-[250%] focus:outline-none" type="text" placeholder="제목을 입력하세요" />
 				<div className="w-full p-4">
 					<div className="mb-4 bg-black bg-opacity-70 w-16 h-[6px]"></div>
 					<div className="border w-full h-16 p-4 mb-8">
 						Tool Box
 					</div>
 				</div>
+
 				{/* 글 작성 부분 */}
 				<Note />
 

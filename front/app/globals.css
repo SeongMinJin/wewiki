@@ -7,3 +7,7 @@ body {
   margin: 0;
   overflow-x: hidden;
 }
+
+code {
+  background-color: gainsboro;
+}
