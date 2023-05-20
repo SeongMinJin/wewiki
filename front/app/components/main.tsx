@@ -14,7 +14,7 @@ export default function Main() {
 		}}>
 			<div className="w-full tablet:w-[1024px] laptop:w-[1440px] desktop:w-[1920px]">
 				<Nav isOpen={isOpen}/>
-				{/* <Section /> */}
+				<Section />
 			</div>
 		</div>
 	)

@@ -64,7 +64,7 @@ export default function Section() {
 		<ul className="grid gap-8 place-items-stretch phone:grid-cols-2 tablet:grid-cols-3 laptop:grid-cols-4 desktop:grid-cols-5">
 			{
 				post.map(elem => (
-					<li id={elem.id}>
+					<li key={elem.id}>
 						<Post path={elem.path} title={elem.title} content={elem.content} date={elem.date} author={elem.author} />
 					</li>
 				))
@@ -97,6 +97,7 @@ function Post({
 					objectFit: 'cover',
 					aspectRatio: '16 / 9',
 				}}
+				priority={true}
 				className="rounded-t"
 				alt="Image of Thumbnail"
 			/>
@@ -106,7 +107,7 @@ function Post({
 					<p className="text-[80%] line-clamp-3 opacity-70 leading-5 min-h-[3.75rem]">{content}</p>
 				</div>
 				<div>
-					<p className="line-clamp-1 text-[80%] opacity-50">{date.getFullYear()}년 {date.getMonth()}월 {date.getDate()}일</p>
+					<p className="line-clamp-1 text-[80%] opacity-50">{date.getFullYear()}년 {date.getMonth() + 1}월 {date.getDate()}일</p>
 				</div>
 			</div>
 			<div className="w-full px-4 py-2 border-t flex gap-x-2 items-center">
