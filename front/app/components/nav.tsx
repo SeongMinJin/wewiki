@@ -4,9 +4,11 @@ import Image from "next/image";
 import Fab from "./fab";
 import Link from "next/link";
 
-export default function Nav() {
+export default function Nav({ isOpen }: {
+	isOpen: boolean,
+}) {
 	const [isLogin, setIsLogin] = useState(false);
-	const [isOpen, setIsOpen] = useState(false);
+	// const [isOpen, setIsOpen] = useState(false);
 	return (
 		<nav className="w-full relative my-8 h-[40px] flex justify-between">
 			<div className="w-auto flex items-center font-abril-fatface tracking-widest text-[140%] opacity-70">
@@ -20,7 +22,7 @@ export default function Nav() {
 								<Link href="/write" className="hidden tablet:block border border-black rounded-3xl py-1 px-4 w-auto text-[100%] hover:bg-black hover:text-white whitespace-nowrap duration-500">
 									새 글 작성
 								</Link>
-								<div onClick={() => setIsOpen(!isOpen)} className="flex items-center cursor-pointer group/avatar">
+								<div id="avatar" className="flex items-center cursor-pointer group/avatar">
 									<Image
 										src="/건빵.png"
 										width={40}

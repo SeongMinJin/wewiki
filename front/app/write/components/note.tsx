@@ -148,7 +148,9 @@ const Element = ({ attributes, children, element }: {
 }
 
 
-export default function Note() {
+export default function Note({ title }: {
+  title: string,
+}) {
 
   const renderElement = useCallback((props: any) => <Element {...props} />, [])
   const editor = useMemo(
@@ -221,7 +223,7 @@ export default function Note() {
           onDOMBeforeInput={handleDOMBeforeInput}
           renderElement={renderElement}
           spellCheck
-          placeholder="여러분의 위키를 만들어보세요"
+          placeholder={`내 인생에서 ${title}(이)란...`}
           className="text-lg m-4"
         />
       </Slate>
