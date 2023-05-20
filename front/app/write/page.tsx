@@ -1,11 +1,14 @@
-import Note from "./components/note"
+import dynamic from "next/dynamic"
+
+const Note = dynamic(() => import('./components/note'), {
+	ssr: false,
+})
 
 export default function Write() {
-
 	return (
-		<form className="relative w-screen min-w-[350px] h-screen flex" action="">
+		<form className="relative w-screen min-w-[350px] h-screen" action="">
 			<div className="relative w-full h-full phone:pt-8 phone:px-12 pb-20 flex flex-col">
-				<input autoFocus className="w-full font-noto font-semibold p-4 text-[250%] focus:outline-none" type="text" placeholder="제목을 입력하세요" />
+				<input className="w-full font-noto font-semibold p-4 text-[250%] focus:outline-none" type="text" placeholder="제목을 입력하세요" />
 				<div className="w-full p-4">
 					<div className="mb-4 bg-black bg-opacity-70 w-16 h-[6px]"></div>
 					<div className="border w-full h-16 p-4 mb-8">
@@ -29,8 +32,6 @@ export default function Write() {
 						</button>
 					</div>
 				</div>
-			</div>
-			<div className="w-full p-12 hidden tablet:block bg-red-50 bg-opacity-70">
 			</div>
 		</form>
 	)
