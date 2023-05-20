@@ -4,7 +4,6 @@ import { Editable, ReactEditor, Slate, withReact } from "slate-react";
 import React, { useCallback, useMemo } from "react";
 import {
   createEditor,
-  Descendant,
   Editor,
   Element as SlateElement,
   Node as SlateNode,
@@ -21,9 +20,10 @@ const SHORTCUTS = {
   '1.': 'list-item',
   '#': 'heading-one',
   '##': 'heading-two',
-  '###': 'heading-three',
-  '####': 'heading-four',
 }
+
+
+
 
 const withShortcuts = (editor: Editor) => {
   const { deleteBackward, insertText } = editor
@@ -108,7 +108,7 @@ const withShortcuts = (editor: Editor) => {
               match: n =>
                 !Editor.isEditor(n) &&
                 SlateElement.isElement(n) &&
-                n.type === 'bulleted-list',
+                (n.type === 'bulleted-list' || n.type === 'ordered-list'),
               split: true,
             })
           }
@@ -140,10 +140,6 @@ const Element = ({ attributes, children, element }: {
       return <h1 className="text-3xl font-bold" {...attributes}>{children}</h1>
     case 'heading-two':
       return <h2 className="text-2xl font-bold" {...attributes}>{children}</h2>
-    case 'heading-three':
-      return <h3 className="text-xl font-bold" {...attributes}>{children}</h3>
-    case 'heading-four':
-      return <h4 className="text-lg font-bold" {...attributes}>{children}</h4>
     case 'list-item':
       return <li {...attributes}>{children}</li>
     default:
@@ -152,15 +148,13 @@ const Element = ({ attributes, children, element }: {
 }
 
 
-
 export default function Note() {
+
   const renderElement = useCallback((props: any) => <Element {...props} />, [])
   const editor = useMemo(
     () => withShortcuts(withReact(withHistory(createEditor()))),
     []
   )
-
-
   const handleDOMBeforeInput = useCallback(
     (e: InputEvent) => {
       queueMicrotask(() => {
@@ -196,7 +190,6 @@ export default function Note() {
     },
     [editor]
   )
-
   const initialValue = useMemo(
     () => {
         const content = localStorage.getItem('content');
@@ -208,27 +201,30 @@ export default function Note() {
         ]
     }, []
   )
+  
 
   return (
-    <Slate editor={editor} value={initialValue} onChange={
-      value => {
-        const isAstChange = editor.operations.some(
-          op => 'set_selection' !== op.type
-        )
-        if (isAstChange) {
-          // Save the value to Local Storage.
-          const content = JSON.stringify(value)
-          localStorage.setItem('content', content)
+    <div id="content" className="relative w-full overflow-y-auto">
+      <Slate editor={editor} value={initialValue} onChange={
+        value => {
+          const isAstChange = editor.operations.some(
+            op => 'set_selection' !== op.type
+          )
+          if (isAstChange) {
+            // Save the value to Local Storage.
+            const content = JSON.stringify(value)
+            localStorage.setItem('content', content)
+          }
         }
-      }
-    }>
-      <Editable
-        onDOMBeforeInput={handleDOMBeforeInput}
-        renderElement={renderElement}
-        spellCheck
-        placeholder="여러분의 위키를 만들어보세요"
-        className="text-xl m-4"
-      />
-    </Slate>
+      }>
+        <Editable
+          onDOMBeforeInput={handleDOMBeforeInput}
+          renderElement={renderElement}
+          spellCheck
+          placeholder="여러분의 위키를 만들어보세요"
+          className="text-lg m-4"
+        />
+      </Slate>
+    </div>
   )
 }
