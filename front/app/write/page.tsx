@@ -2,9 +2,11 @@
 
 import dynamic from "next/dynamic"
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 const Note = dynamic(() => import('./components/note'), {
 	ssr: false,
 })
+
 
 export default function Write() {
 	const [title, setTitle] = useState('');
@@ -12,6 +14,9 @@ export default function Write() {
 		const content = localStorage.getItem('title');
 		if (content) setTitle(content);
 	}, []);
+
+	const router = useRouter();
+
 	return (
 		<div className="relative w-screen min-w-[350px] h-screen">
 			<div className="relative w-full h-full phone:pt-8 phone:px-12 pb-20 flex flex-col">
@@ -27,7 +32,7 @@ export default function Write() {
 				<Note title={title}/>
 
 				<div className="absolute w-full h-fit left-0 bottom-0 z-10 flex justify-between shadow-2xl shadow-black font-noto text-lg px-4 py-4">
-					<button className="py-2 px-4 hover:bg-gray-100 rounded-md">
+					<button onClick={() => router.back()} className="py-2 px-4 hover:bg-gray-100 rounded-md">
 						⬅ 나가기
 					</button>
 					<div className="flex gap-x-4">
