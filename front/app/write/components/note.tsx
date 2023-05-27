@@ -198,7 +198,7 @@ export default function Note({ title }: {
         return content ? JSON.parse(content) : [
           {
             type: 'paragraph',
-            children: [{ text: '여러분의 위키를 만들어보세요' }],
+            children: [{ text: '' }],
           },
         ]
     }, []

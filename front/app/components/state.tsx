@@ -2,6 +2,7 @@
 
 import { createContext, useReducer } from "react"
 import type { Dispatch } from "react";
+import { Provider } from "next-auth/providers";
 
 const initialState = {
 	isLogin: false,
