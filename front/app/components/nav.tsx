@@ -8,7 +8,7 @@ import { StateContext, StateDispatchContext } from "./state";
 export default function Nav() {
 
 	const state = useContext(StateContext);
-	const dispatch = useContext(StateDispatchContext)
+	const dispatch = useContext(StateDispatchContext);
 
 	return (
 		<nav className="w-full relative my-8 h-[40px] flex justify-between">
@@ -40,7 +40,7 @@ export default function Nav() {
 							</div>
 							<Fab />
 						</> :
-						<button onClick={() => dispatch({type: 'login'})} className=" shrink-0 text-[100%] rounded-3xl py-1 px-4 bg-black text-white hover:opacity-70">
+						<button onClick={() => dispatch({type: 'openLogin'})} className=" shrink-0 text-[100%] rounded-3xl py-1 px-4 bg-black text-white hover:opacity-70">
 							로그인
 						</button>
 				}
@@ -53,7 +53,7 @@ export default function Nav() {
 }
 
 function Drawer() {
-	const state = useContext(StateContext);
+	// const state = useContext(StateContext);
 	const dispatch = useContext(StateDispatchContext);
 	return (
 		<div className="absolute w-64 place-self-stretch top-[100%] right-0">

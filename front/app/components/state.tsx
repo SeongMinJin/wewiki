@@ -2,11 +2,11 @@
 
 import { createContext, useReducer } from "react"
 import type { Dispatch } from "react";
-import { Provider } from "next-auth/providers";
 
 const initialState = {
 	isLogin: false,
 	isOpen: false,
+	isLoginOpen: false,
 }
 
 export const StateContext = createContext(initialState);
@@ -53,6 +53,18 @@ function StateReducer(state: any, action: { type: string }) {
 			return {
 				...state,
 				isOpen: false,
+			}
+		}
+		case 'openLogin': {
+			return {
+				...state,
+				isLoginOpen: true,
+			}
+		}
+		case 'closeLogin': {
+			return {
+				...state,
+				isLoginOpen: false,
 			}
 		}
 		default:

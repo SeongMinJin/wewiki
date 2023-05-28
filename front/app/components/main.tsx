@@ -1,6 +1,7 @@
 'use client'
 
 import Nav from "./nav"
+import Login from "./login";
 import Section from "./section"
 import { useContext } from "react";
 import { StateContext, StateDispatchContext } from "./state";
@@ -12,14 +13,15 @@ export default function Main() {
 	const dispatch = useContext(StateDispatchContext);
 	
 	return (
-		<div className="w-screen min-w-[300px] min-h-screen flex justify-center px-6" onClick={(e: any) => {
+		<div id="root" className="relative w-screen min-w-[300px] min-h-screen flex justify-center px-6" onClick={(e: any) => {
 			const avatar = document.getElementById('avatar');
 			avatar?.contains(e.target) ? dispatch({ type: state.isOpen ? 'close' : 'open' }) : dispatch({ type: 'close' });
 		}}>
-			<div className="w-full tablet:w-[1024px] laptop:w-[1440px] desktop:w-[1920px]">
+			<div className="relative w-full tablet:w-[1024px] laptop:w-[1440px] desktop:w-[1920px]">
 				<Nav />
 				<Section />
 			</div>
+			<Login />
 		</div>
 	)
 }
