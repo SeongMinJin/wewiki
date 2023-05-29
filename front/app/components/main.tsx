@@ -5,13 +5,13 @@ import Login from "./login";
 import Section from "./section"
 import { useContext } from "react";
 import { StateContext, StateDispatchContext } from "./state";
-
+import { toast, ToastContainer } from "react-toastify";
 
 export default function Main() {
 
 	const state = useContext(StateContext);
 	const dispatch = useContext(StateDispatchContext);
-	
+
 	return (
 		<div id="root" className="relative w-screen min-w-[300px] min-h-screen flex justify-center px-6" onClick={(e: any) => {
 			const avatar = document.getElementById('avatar');
@@ -22,6 +22,47 @@ export default function Main() {
 				<Section />
 			</div>
 			<Login />
+			<ToastContainer
+				position="top-right"
+				autoClose={3000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="colored"
+			/>
 		</div>
 	)
+}
+
+export function ToastWraper(type: string, message: string) {
+	switch (type) {
+		case "error":
+			return toast.error(message, {
+				position: "top-right",
+				autoClose: 3000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "colored",
+			})
+		case "warn":
+			return toast.warn(message, {
+				position: "top-right",
+				autoClose: 3000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "colored",
+			})
+		default:
+			return;
+	}
 }

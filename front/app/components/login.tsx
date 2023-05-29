@@ -2,6 +2,8 @@
 
 import { FormEvent, useContext, useState } from "react"
 import { StateContext, StateDispatchContext } from "./state"
+import { ToastWraper } from "./main";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Login() {
 	const state = useContext(StateContext);
@@ -26,8 +28,8 @@ export default function Login() {
 				<div className="w-full flex">
 					<form className="w-full" onSubmit={(e: FormEvent) => Submit(e, id, password)}>
 						<div className="divide-y border">
-							<input required onChange={(e) => setId(e.target.value)} id="name" className="w-full p-3 focus-within:outline-red-200" type="text" placeholder="아이디를 입력하세요." />
-							<input required onChange={(e) => setPassword(e.target.value)} id="password" className="w-full p-3 focus-within:outline-red-200" type="password" placeholder="비밀번호를 입력하세요." />
+							<input onChange={(e) => setId(e.target.value)} id="name" className="w-full p-3 focus-within:outline-red-200" type="text" placeholder="아이디를 입력하세요." />
+							<input onChange={(e) => setPassword(e.target.value)} id="password" className="w-full p-3 focus-within:outline-red-200" type="password" placeholder="비밀번호를 입력하세요." />
 						</div>
 						<button className="w-full p-3 whitespace-nowrap min-w-[100px] flex justify-center text-center bg-red-400 text-white hover:bg-red-300" type="submit" onClick={() => console.log(process.env.SERVER_IP)}>
 							{signUp ? "회원가입" : "로그인"}
@@ -53,8 +55,15 @@ export default function Login() {
 
 const Submit = async (e: FormEvent, id: string, password: string) => {
 	e.preventDefault();
-	if (id === "" || id === null || id === undefined) return false;
-	if (password === "" || password === null || password === undefined) return false;
+	if (id === "" || id === null || id === undefined) {
+		ToastWraper("error", "아이디를 입력해주세요.");
+		return;
+	}
+
+	if (password === "" || password === null || password === undefined) {
+		ToastWraper("error", "비밀번호를 입력해주세요.");
+		return;
+	}
 }
 
 const SignIn = (id: string, password: string) => {
