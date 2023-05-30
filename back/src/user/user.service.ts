@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
@@ -12,12 +12,23 @@ export class UserService {
 		private userRepositoy: Repository<User>,
 	) {}
 
+	async findOne(name: string) {
+		return await this.userRepositoy.findOne({
+			where: {
+				name: name,
+			}
+		})
+	}
+
 	async create(name: string, password: string) {
+		if (await this.findOne(name) !== null) {
+			throw new HttpException({reason: "이미 사용중인 아이디입니다."}, HttpStatus.CONFLICT);
+		}
+
 		const newUser = this.userRepositoy.create({
 			name: name,
 			password: password,
 		})
-
 		await this.userRepositoy.save(newUser);
 	}
 }

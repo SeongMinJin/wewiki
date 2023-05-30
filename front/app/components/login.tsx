@@ -26,12 +26,28 @@ export default function Login() {
 				<h2 className="text-xl font-bold">{signUp ? "회원가입" : "로그인"}</h2>
 				<h4 className="font-bold text-black text-opacity-40">아이디로 {signUp ? "회원가입" : "로그인"}</h4>
 				<div className="w-full flex">
-					<form className="w-full" onSubmit={(e: FormEvent) => Submit(e, id, password)}>
+					<form className="w-full" onSubmit={async (e: FormEvent) => {
+							const res = await	Submit(e, id, password, signUp);
+							if (res && signUp) {
+								setSignUp(false);
+								setId("");
+								setPassword("");
+								return;
+							}
+
+							if (res && !signUp) {
+								dispatch({type: "closeLogin"});
+								dispatch({type: "login"});
+								setId("");
+								setPassword("");
+							}
+						}
+					}>
 						<div className="divide-y border">
-							<input onChange={(e) => setId(e.target.value)} id="name" className="w-full p-3 focus-within:outline-red-200" type="text" placeholder="아이디를 입력하세요." />
-							<input onChange={(e) => setPassword(e.target.value)} id="password" className="w-full p-3 focus-within:outline-red-200" type="password" placeholder="비밀번호를 입력하세요." />
+							<input value={id} onChange={(e) => setId(e.target.value)} id="id" className="w-full p-3 focus-within:outline-red-200" type="text" placeholder="아이디를 입력하세요." />
+							<input value={password} onChange={(e) => setPassword(e.target.value)} id="password" className="w-full p-3 focus-within:outline-red-200" type="password" placeholder={`${signUp ? "영문 숫자 특수기호 조합 8~15 자리." : "비밀번호를 입력하세요."}`} />
 						</div>
-						<button className="w-full p-3 whitespace-nowrap min-w-[100px] flex justify-center text-center bg-red-400 text-white hover:bg-red-300" type="submit" onClick={() => console.log(process.env.SERVER_IP)}>
+						<button className="w-full p-3 whitespace-nowrap min-w-[100px] flex justify-center text-center bg-red-400 text-white hover:bg-red-300" type="submit">
 							{signUp ? "회원가입" : "로그인"}
 						</button>
 					</form>
@@ -47,29 +63,80 @@ export default function Login() {
 					</button>
 				</span>
 			</div>
-
-
 		</div>
 	)
 }
 
-const Submit = async (e: FormEvent, id: string, password: string) => {
+const Submit = async (e: FormEvent, id: string, password: string, signUp: boolean): Promise<boolean> => {
 	e.preventDefault();
 	if (id === "" || id === null || id === undefined) {
 		ToastWraper("error", "아이디를 입력해주세요.");
-		return;
+		return false;
 	}
 
 	if (password === "" || password === null || password === undefined) {
 		ToastWraper("error", "비밀번호를 입력해주세요.");
-		return;
+		return false;
+	}
+
+	return signUp ? SignUp(id, password) : SignIn(id, password);
+}
+
+const SignIn = async (id: string, password: string): Promise<boolean> => {
+	const res = await fetch(`http://${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signin`, {
+		headers: {
+			"Content-Type": "application/json",
+		},
+		method: "post",
+		body: JSON.stringify({
+			id: id,
+			password: password,
+		})
+	});
+
+	switch (res.status) {
+		case 200:
+			return true;
+		case 401:
+			ToastWraper("error", "로그인 정보가 유효하지 않습니다.");
+			return false;
+		case 500:
+			ToastWraper("error", "서버가 아파요 :(");
+			return false;
+		default:
+			return false;
 	}
 }
 
-const SignIn = (id: string, password: string) => {
-	
-}
+const SignUp = async (id: string, password: string): Promise<boolean> => {
+	const regex = new RegExp(process.env.NEXT_PUBLIC_PASSWORD_REGEX ? process.env.NEXT_PUBLIC_PASSWORD_REGEX.toString() : /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$/);
+	if (!regex.test(password)) {
+		ToastWraper("error", "비밀번호 규칙을 확인해주세요.");
+		return false;
+	}
 
-const SignUp = (id: string, password: string) => {
+	const res = await fetch(`http://${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signup`, {
+		headers: {
+			"Content-Type": "application/json"
+		},
+		method: "post",
+		body: JSON.stringify({
+			id: id,
+			password: password,
+		}),
+	});
 
+	switch (res.status) {
+		case 201:
+			ToastWraper("success", "회원가입을 축하합니다!");
+			return true;
+		case 409:
+			ToastWraper("error", "이미 사용중인 아이디입니다.");
+			return false;
+		case 500:
+			ToastWraper("error", "서버가 아파요 :(");
+			return false;
+		default:
+			return false;
+	}
 }

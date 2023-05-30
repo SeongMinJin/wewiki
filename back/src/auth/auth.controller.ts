@@ -1,6 +1,8 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { Request } from 'express';
 import { CreateUserDto } from 'src/dto/createUser.dto';
 import { UserService } from 'src/user/user.service';
+import { LocalAuthGuard } from './local.strategy';
 
 @Controller('auth')
 export class AuthController {
@@ -10,15 +12,17 @@ export class AuthController {
 
 
 	@HttpCode(200)
+	@UseGuards(LocalAuthGuard)
 	@Post('signin')
-	SignIn() {
-		
+	async SignIn(@Req() req: Request) {
+		// return session Id or JWT
+		return;
 	}
 
 
 	@Post('signup')
-	SignUp(@Body() body: CreateUserDto) {
-		this.userService.create(body.name, body.password);
+	async SignUp(@Body() body: CreateUserDto) {
+		await this.userService.create(body.id, body.password);
 	}
 
 

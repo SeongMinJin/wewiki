@@ -62,6 +62,17 @@ export function ToastWraper(type: string, message: string) {
 				progress: undefined,
 				theme: "colored",
 			})
+		case "success":
+			return toast.success(message, {
+				position: "top-right",
+				autoClose: 3000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "colored",
+			})
 		default:
 			return;
 	}
