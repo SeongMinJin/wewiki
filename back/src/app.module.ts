@@ -5,6 +5,7 @@ import { join } from 'path';
 import { UserModule } from './user/user.module';
 import { WikiModule } from './wiki/wiki.module';
 import { CommentModule } from './comment/comment.module';
+import { PassportModule } from '@nestjs/passport';
 require("dotenv").config();
 
 @Module({

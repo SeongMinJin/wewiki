@@ -13,4 +13,8 @@ export class AuthService {
 		const user = await this.userService.findOne(name);
 		return user ? user.password === password ? user : null : null;
 	}
+
+	// login(name: string, password: string): Promise<any> {
+
+	// }
 }

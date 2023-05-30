@@ -27,22 +27,22 @@ export default function Login() {
 					<h4 className="font-bold text-black text-opacity-40">아이디로 {signUp ? "회원가입" : "로그인"}</h4>
 					<div className="w-full flex">
 						<form className="w-full" onSubmit={async (e: FormEvent) => {
-								const res = await	Submit(e, id, password, signUp);
-								if (res && signUp) {
-									setSignUp(false);
-									setId("");
-									setPassword("");
-									document.getElementById("id")?.focus();
-									return;
-								}
-
-								if (res && !signUp) {
-									dispatch({type: "closeLogin"});
-									dispatch({type: "login"});
-									setId("");
-									setPassword("");
-								}
+							const res = await Submit(e, id, password, signUp);
+							if (res && signUp) {
+								setSignUp(false);
+								setId("");
+								setPassword("");
+								document.getElementById("id")?.focus();
+								return;
 							}
+
+							if (res && !signUp) {
+								dispatch({ type: "closeLogin" });
+								dispatch({ type: "login" });
+								setId("");
+								setPassword("");
+							}
+						}
 						}>
 							<div className="divide-y border">
 								<input value={id} onChange={(e) => setId(e.target.value)} id="id" className="w-full p-3 focus-within:outline-red-200" type="text" placeholder="아이디를 입력하세요." />
@@ -55,7 +55,7 @@ export default function Login() {
 					</div>
 				</div>
 				<div className="absolute bottom-5 right-5">
-					{ signUp ? "이미 회원이신가요 ?" :"아직 회원이 아니신가요 ?"}
+					{signUp ? "이미 회원이신가요 ?" : "아직 회원이 아니신가요 ?"}
 					<span>
 						&nbsp;&nbsp;
 						<button onClick={() => setSignUp(!signUp)} className=" text-red-400">
@@ -84,29 +84,35 @@ const Submit = async (e: FormEvent, id: string, password: string, signUp: boolea
 }
 
 const SignIn = async (id: string, password: string): Promise<boolean> => {
-	const res = await fetch(`http://${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signin`, {
-		headers: {
-			"Content-Type": "application/json",
-		},
-		method: "post",
-		body: JSON.stringify({
-			id: id,
-			password: password,
-		})
-	});
+	try {
+		const res = await fetch(`http://${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signin`, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+			method: "post",
+			body: JSON.stringify({
+				id: id,
+				password: password,
+			})
+		});
 
-	switch (res.status) {
-		case 200:
-			return true;
-		case 401:
-			ToastWraper("error", "로그인 정보가 유효하지 않습니다.");
-			return false;
-		case 500:
-			ToastWraper("error", "서버가 아파요 :(");
-			return false;
-		default:
-			return false;
+		switch (res.status) {
+			case 200:
+				return true;
+			case 401:
+				ToastWraper("error", "로그인 정보가 유효하지 않습니다.");
+				return false;
+			case 500:
+				ToastWraper("error", "서버가 아파요 :(");
+				return false;
+			default:
+				return false;
+		}
+	} catch {
+		ToastWraper("error", "서버가 아파요 :(");
+		return false;
 	}
+
 }
 
 const SignUp = async (id: string, password: string): Promise<boolean> => {
@@ -116,28 +122,34 @@ const SignUp = async (id: string, password: string): Promise<boolean> => {
 		return false;
 	}
 
-	const res = await fetch(`http://${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signup`, {
-		headers: {
-			"Content-Type": "application/json"
-		},
-		method: "post",
-		body: JSON.stringify({
-			id: id,
-			password: password,
-		}),
-	});
+	try {
+		const res = await fetch(`http://${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signup`, {
+			headers: {
+				"Content-Type": "application/json"
+			},
+			method: "post",
+			body: JSON.stringify({
+				id: id,
+				password: password,
+			}),
+		});
 
-	switch (res.status) {
-		case 201:
-			ToastWraper("success", "회원가입을 축하합니다!");
-			return true;
-		case 409:
-			ToastWraper("error", "이미 사용중인 아이디입니다.");
-			return false;
-		case 500:
-			ToastWraper("error", "서버가 아파요 :(");
-			return false;
-		default:
-			return false;
+		switch (res.status) {
+			case 201:
+				ToastWraper("success", "회원가입을 축하합니다!");
+				return true;
+			case 409:
+				ToastWraper("error", "이미 사용중인 아이디입니다.");
+				return false;
+			case 500:
+				ToastWraper("error", "서버가 아파요 :(");
+				return false;
+			default:
+				return false;
+		}
+	} catch {
+		ToastWraper("error", "서버가 아파요 :(");
+		return false;
+
 	}
 }

@@ -1,5 +1,5 @@
-import { Body, Controller, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
-import { Request } from 'express';
+import { Body, Controller, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { CreateUserDto } from 'src/dto/createUser.dto';
 import { UserService } from 'src/user/user.service';
 import { LocalAuthGuard } from './local.strategy';
@@ -14,9 +14,9 @@ export class AuthController {
 	@HttpCode(200)
 	@UseGuards(LocalAuthGuard)
 	@Post('signin')
-	async SignIn(@Req() req: Request) {
-		// return session Id or JWT
-		return;
+	async SignIn(@Req() req: Request, @Res() res: Response) {
+		
+		res.cookie("IamYourFather", req.session.id);
 	}
 
 
