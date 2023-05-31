@@ -59,7 +59,12 @@ function Drawer() {
 		<div className="absolute w-64 place-self-stretch top-[100%] right-0">
 			<ul className="relative shadow-2xl border mt-4 bg-white z-10">
 				<li className="cursor-pointer hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><Link href="/my">내 위키</Link></li>
-				<li className="cursor-pointer hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><Link href="/temp">임시 글</Link></li>
+				<li onClick={async () => {
+					const res = await fetch("http://localhost:3001/auth/test", {
+						credentials: 'include',
+					});
+					console.log(res);
+				}}className="cursor-pointer hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><Link href="/temp">임시 글</Link></li>
 				<li onClick={() => dispatch({type: 'logout'})} className="cursor-pointer hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><button>로그아웃</button></li>
 			</ul>
 		</div>

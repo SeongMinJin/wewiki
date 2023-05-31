@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { WikiModule } from './wiki/wiki.module';
 import { CommentModule } from './comment/comment.module';
 import { PassportModule } from '@nestjs/passport';
+import { SessionModule } from './session/session.module';
 require("dotenv").config();
 
 @Module({
@@ -24,7 +25,8 @@ require("dotenv").config();
     AuthModule,
     UserModule,
     WikiModule,
-    CommentModule
+    CommentModule,
+    SessionModule
   ],
   controllers: [],
   providers: [],

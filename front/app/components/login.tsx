@@ -93,7 +93,8 @@ const SignIn = async (id: string, password: string): Promise<boolean> => {
 			body: JSON.stringify({
 				id: id,
 				password: password,
-			})
+			}),
+			credentials: 'include',
 		});
 
 		switch (res.status) {
