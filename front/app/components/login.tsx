@@ -85,7 +85,7 @@ const Submit = async (e: FormEvent, id: string, password: string, signUp: boolea
 
 const SignIn = async (id: string, password: string): Promise<boolean> => {
 	try {
-		const res = await fetch(`http://${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signin`, {
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signin`, {
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -124,7 +124,7 @@ const SignUp = async (id: string, password: string): Promise<boolean> => {
 	}
 
 	try {
-		const res = await fetch(`http://${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signup`, {
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signup`, {
 			headers: {
 				"Content-Type": "application/json"
 			},

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { throws } from 'assert';
 import { Request, Response } from 'express';
 import { CreateUserDto } from 'src/dto/createUser.dto';
@@ -15,40 +15,29 @@ export class AuthController {
 
 
 	@HttpCode(200)
-	// @UseGuards(LocalAuthGuard)
+	@UseGuards(LocalAuthGuard)
 	@Post('signin')
-	async SignIn(@Req() req: Request, @Res() res: Response) {
-		req.session.user = req.user;
-		req.session.save();
-		res.cookie('IamYourFather', req.sessionID, {
-			maxAge: 1000 * 60 * 60, // 1 hour
-			httpOnly: true,
-		})
-		res.send('Ok');
+	async SignIn(@Req() req: Request) {
+		if (req.session.user) {
+			req.session.regenerate(err => {
+				if (err) throw new HttpException({ reason: "Error on session regeneration" }, HttpStatus.INTERNAL_SERVER_ERROR);
+			});
+		} else { req.session.user = req.user?.name; }
+		req.session.save(err => {
+			if (err) throw new HttpException({ reason: "Error on session save" }, HttpStatus.INTERNAL_SERVER_ERROR);
+		});
 	}
-
-
 
 	@Post('signup')
 	async SignUp(@Body() body: CreateUserDto) {
 		await this.userService.create(body.id, body.password);
 	}
 
-
-	@Post('signout')
-	SignOut() {
-
+	@Get('signout')
+	SignOut(@Req() req: Request) {
+		req.session.destroy(err => {
+			if (err) throw new HttpException({ reason: "Error on session destroy"}, HttpStatus.INTERNAL_SERVER_ERROR);
+		});
 	}
-
-	@Get('test')
-	test(@Req() req: Request) {
-		console.log(req.cookies);
-		console.log(req.headers.cookie);
-		console.log(req.sessionID);
-	}
-
-
-
-
 
 }

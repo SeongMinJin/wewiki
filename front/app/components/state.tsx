@@ -56,6 +56,7 @@ function StateReducer(state: any, action: { type: string }) {
 			}
 		}
 		case 'openLogin': {
+			document.getElementById("id")?.focus();
 			return {
 				...state,
 				isLoginOpen: true,
