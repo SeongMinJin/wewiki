@@ -1,0 +1,38 @@
+services:
+  # front:
+  #   image: "debian:latest"
+  #   expose:
+  #     - 80
+
+  # back:
+  #   image: "debian:latest"
+  #   expose:
+  #     - 80
+
+  # db:
+  #   image: "postgres"
+
+  nginx:
+    image: "nginx"
+    ports:
+      - 80:80
+    networks:
+      - wewiki_network
+    volumes:
+      - front:/usr/share/nginx/html
+
+
+networks:
+  wewiki_network: {}
+
+volumes:
+  front:
+    driver_opts:
+      type: volume
+      o: bind
+      device: /Users/jinseongmin/Desktop/workshop/wewiki/app/front/srcs
+  db:
+    driver_opts:
+      type: volume
+      o: bind
+      device: /Users/jinseongmin/Desktop/workshop/wewiki/app/db/srcs
