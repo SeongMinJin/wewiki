@@ -88,7 +88,7 @@ function Post({
 	author: string,
 }) {
 	return (
-		<div className="w-full font-noto shadow hover:-translate-y-3 rounded duration-500 cursor-pointer">
+		<div className="w-full duration-500 rounded shadow cursor-pointer font-noto hover:-translate-y-3">
 			<Image
 				src={path}
 				width={1000}
@@ -101,7 +101,7 @@ function Post({
 				className="rounded-t"
 				alt="Image of Thumbnail"
 			/>
-			<div className="w-full p-3 flex-grow flex-shrink">
+			<div className="flex-grow flex-shrink w-full p-3">
 				<div>
 					<h4 className="text-[100%] font-medium line-clamp-1">{title}</h4>
 					<p className="text-[80%] line-clamp-3 opacity-70 leading-5 min-h-[3.75rem]">{content}</p>
@@ -110,7 +110,7 @@ function Post({
 					<p className="line-clamp-1 text-[80%] opacity-50">{date.getFullYear()}년 {date.getMonth() + 1}월 {date.getDate()}일</p>
 				</div>
 			</div>
-			<div className="w-full px-4 py-2 border-t flex gap-x-2 items-center">
+			<div className="flex items-center w-full px-4 py-2 border-t gap-x-2">
 				<Image
 				src="/건빵.png"
 				width={25}
