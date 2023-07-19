@@ -4,23 +4,27 @@ services:
   #   expose:
   #     - 80
 
-  # back:
-  #   image: "debian:latest"
-  #   expose:
-  #     - 80
+  back:
+    build: ${PWD}/app/back
+    expose:
+      - 80
+    networks:
+      - wewiki_network
+    volumes:
+      - back:/home
 
   # db:
   #   image: "postgres"
 
+
   nginx:
-    image: "nginx"
+    build: ${PWD}/app/nginx
     ports:
       - 80:80
     networks:
       - wewiki_network
-    volumes:
-      - front:/usr/share/nginx/html
-
+    # volumes:
+    #   - front:/usr/share/nginx/html
 
 networks:
   wewiki_network: {}
@@ -30,9 +34,19 @@ volumes:
     driver_opts:
       type: volume
       o: bind
-      device: /Users/jinseongmin/Desktop/workshop/wewiki/app/front/srcs
-  db:
+      device: /Users/seojin/Desktop/test
+  back:
     driver_opts:
       type: volume
       o: bind
-      device: /Users/jinseongmin/Desktop/workshop/wewiki/app/db/srcs
+      device: /Users/seojin/Desktop/test
+
+      # device: /Users/seojin/goinfre/wewiki/app/front/
+      # device: /Users/seojin/goinfre
+      # device: /Users/jinseongmin/Desktop/workshop/wewiki/app/front/srcs
+  # db:
+  #   driver_opts:
+  #     type: volume
+  #     o: bind
+      # device: /Users/jinseongmin/Desktop/workshop/wewiki/app/db/srcs
+      # device: /Users/seojin/goinfre/wewiki/app/db/srcs
