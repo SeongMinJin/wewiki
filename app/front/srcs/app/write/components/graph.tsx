@@ -103,7 +103,7 @@ export default function Graph({
 					.style("stroke", "none")
 			})
 			// .on("mouseover", mouseOver)
-			.attr("r", "10")
+			.attr("r", "30")
 			.style("fill", (d) => d.id === currentWiki?.id ? "red" : "orange")
 
 
@@ -124,8 +124,8 @@ export default function Graph({
 			.force("charge", d3.forceManyBody().strength(-20))
 			// .force("charge", d3.forceManyBody().strength(-30).distanceMax(100))
 			.force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2))
-			.force("collide", d3.forceCollide(20))
-			.force("position", d3.forceRadial(20, WIDTH / 2, HEIGHT / 2))
+			.force("collide", d3.forceCollide(40))
+			.force("position", d3.forceRadial(200, WIDTH / 2, HEIGHT / 2))
 			.on("tick", ticked);
 
 			
