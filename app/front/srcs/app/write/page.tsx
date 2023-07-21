@@ -37,7 +37,7 @@ export default function Write() {
 				} else {
 					ToastWraper("error", res.message);
 				}
-	
+
 			} catch (err) {
 				ToastWraper("error", "서버가 아파요 :(");
 			}

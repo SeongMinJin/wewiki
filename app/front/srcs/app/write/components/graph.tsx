@@ -1,7 +1,7 @@
 'use client'
 
 import * as d3 from "d3"
-import { useEffect, useState } from "react"
+import { MouseEvent, useEffect, useState } from "react"
 import { Wiki } from "../page";
 import { ToastWraper } from "@/app/components/main";
 
@@ -65,8 +65,6 @@ export default function Graph({
 	currentWiki: Wiki | undefined,
 }) {
 
-	const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
-
 	function draw() {
 		const WIDTH = document.getElementById("graph")?.parentElement?.clientWidth || 0;
 		const HEIGHT = document.getElementById("graph")?.parentElement?.clientHeight || 0;
@@ -75,6 +73,12 @@ export default function Graph({
 		
 		svg.attr("width", WIDTH).attr("height", HEIGHT);
 
+		function mouseOver(d) {
+			d3.select(this)
+				.style("stroke", "red");
+			console.log(this);
+		}
+	
 		// const links = svg.append("g")
 		// 	.selectAll("line")
 		// 	.data(data.links)
@@ -88,8 +92,20 @@ export default function Graph({
 			.data(wikies)
 			.enter()
 			.append("circle")
+			.attr("id", (d) => "id" + d.id)
+			.on("mouseover", (i, j) => {
+				d3.select(i.target)
+					.style("stroke", "red")
+					.style("stroke-width", 3)
+			})
+			.on("mouseleave", (i, j) => {
+				d3.select(i.target)
+					.style("stroke", "none")
+			})
+			// .on("mouseover", mouseOver)
 			.attr("r", "10")
-			.style("fill", "orange");
+			.style("fill", (d) => d.id === currentWiki?.id ? "red" : "orange")
+
 
 		function ticked() {
 			// links
@@ -162,9 +178,6 @@ export default function Graph({
 		draw();
 		window.addEventListener("resize", trigger);
 	}, [wikies])
-
-
-
 
 	return (
 		<div id="graph" className="relative flex w-full">
