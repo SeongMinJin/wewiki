@@ -3,7 +3,7 @@ import { useContext } from "react"
 import Image from "next/image";
 import Fab from "./fab";
 import Link from "next/link";
-import { StateContext, StateDispatchContext } from "./state";
+import { StateContext, StateDispatchContext } from "../state";
 import { ToastWraper } from "./main";
 
 export default function Nav() {
@@ -16,7 +16,7 @@ export default function Nav() {
 			<div className="w-auto flex items-center font-abril-fatface tracking-widest text-[140%] opacity-70">
 				<a href="">weWiki</a>
 			</div>
-			<div className="w-auto relative flex items-center font-noto">
+			<div className="relative flex items-center w-auto font-noto">
 				{
 					state.isLogin ?
 						<>
@@ -36,7 +36,7 @@ export default function Nav() {
 										}}
 										className="rounded-full shadow-lg"
 									/>
-									<span className="opacity-50 group-hover/avatar:opacity-100 duration-300">▾</span>
+									<span className="duration-300 opacity-50 group-hover/avatar:opacity-100">▾</span>
 								</div>
 							</div>
 							<Fab />
@@ -58,9 +58,9 @@ function Drawer() {
 	const dispatch = useContext(StateDispatchContext);
 	return (
 		<div className="absolute w-64 place-self-stretch top-[100%] right-0">
-			<ul className="relative shadow-2xl border mt-4 bg-white z-10">
-				<li className="cursor-pointer hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><Link href="/my">내 위키</Link></li>
-				<li className="cursor-pointer hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><Link href="/temp">임시 글</Link></li>
+			<ul className="relative z-10 mt-4 bg-white border shadow-2xl">
+				<li className="p-3 cursor-pointer hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 whitespace-nowrap"><Link href="/my">내 위키</Link></li>
+				<li className="p-3 cursor-pointer hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 whitespace-nowrap"><Link href="/temp">임시 글</Link></li>
 				<li onClick={async () => {
 					const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signout`, {
 						credentials: "include",
@@ -72,7 +72,7 @@ function Drawer() {
 						default:
 							ToastWraper("error", "서버가 아파요 :(");
 					}
-				}} className="cursor-pointer hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 p-3 whitespace-nowrap"><button>로그아웃</button></li>
+				}} className="p-3 cursor-pointer hover:bg-red-100 hover:bg-opacity-30 hover:text-red-400 whitespace-nowrap"><button>로그아웃</button></li>
 			</ul>
 		</div>
 	)

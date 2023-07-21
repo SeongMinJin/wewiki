@@ -1,5 +1,5 @@
 import Main from "./components/main"
-import Provider from "./components/state"
+import Provider from "./state"
 
 export default function Home() {
   return (

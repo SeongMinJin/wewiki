@@ -4,7 +4,7 @@ import Nav from "./nav"
 import Login from "./login";
 import Section from "./section"
 import { useContext } from "react";
-import { StateContext, StateDispatchContext } from "./state";
+import { StateContext, StateDispatchContext } from "../state";
 import { toast, ToastContainer } from "react-toastify";
 
 export default function Main() {
