@@ -17,6 +17,8 @@ export class Wiki {
 	title: string;
 
 	// need to be modified
-	@Column()
+	@Column({
+		nullable: true,
+	})
 	content: string;
 }

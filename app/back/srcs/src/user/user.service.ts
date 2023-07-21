@@ -28,6 +28,8 @@ export class UserService {
 		const newUser = this.userRepositoy.create({
 			name: name,
 			password: password,
+			wiki: [],
+			comment: [],
 		})
 		await this.userRepositoy.save(newUser);
 	}

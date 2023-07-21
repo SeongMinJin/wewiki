@@ -5,12 +5,12 @@ import { join } from 'path';
 import { UserModule } from './user/user.module';
 import { WikiModule } from './wiki/wiki.module';
 import { CommentModule } from './comment/comment.module';
-import { PassportModule } from '@nestjs/passport';
 import { SessionModule } from './session/session.module';
-require("dotenv").config();
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: "postgres",
       host: process.env.POSTGRESQL_HOST,
