@@ -1,6 +1,6 @@
 import { Comment } from "src/comment/entity/comment.entity";
 import { Wiki } from "src/wiki/entity/wiki.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class User {
@@ -26,6 +26,5 @@ export class User {
 		nullable: true,
 	})
 	comment: Comment[];
-
 
 }

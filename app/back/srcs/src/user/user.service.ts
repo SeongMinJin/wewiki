@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
 
-
 @Injectable()
 export class UserService {
 
@@ -12,16 +11,21 @@ export class UserService {
 		private userRepositoy: Repository<User>,
 	) {}
 
-	async findOne(name: string) {
+	async findOneByName(name: string): Promise<User | null> {
 		return await this.userRepositoy.findOne({
 			where: {
 				name: name,
+			},
+			relations: {
+				wiki: {
+					refer: true,
+				}
 			}
 		})
 	}
 
 	async create(name: string, password: string) {
-		if (await this.findOne(name) !== null) {
+		if (await this.findOneByName(name) !== null) {
 			throw new HttpException({reason: "이미 사용중인 아이디입니다."}, HttpStatus.CONFLICT);
 		}
 
