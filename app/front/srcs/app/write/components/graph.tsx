@@ -1,18 +1,23 @@
 import * as d3 from "d3"
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
 import { Relation, Wiki } from "../page";
 import { ToastWraper } from "@/app/components/main";
 
 
 export default function Graph({
-	setCurrentWiki
+	tickAddNewWiki,
+	setTickAddNewWiki,
+	setCurrentWiki,
 } : {
+	tickAddNewWiki: boolean,
+	setTickAddNewWiki: Dispatch<SetStateAction<boolean>>,
 	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>
 }
 ) {
 
 	let _wikies: Wiki[] = [];
 	let _relations: Relation[] = [];
+	let _currentWiki: Wiki | null = null;
 	
 	let SVG: any
 	let SIMULATION: any;
@@ -21,6 +26,7 @@ export default function Graph({
 	let link: any;
 
 	function update(nodes: any, links: any) {
+
 		const old = new Map(node.data().map((d: any) => [d.id, d]));
 		nodes = nodes.map((d: any) => Object.assign(old.get(d.id) || {}, d));
 		links = links.map((d: any) => Object.assign({}, d));
@@ -34,12 +40,64 @@ export default function Graph({
 			.join((enter: any) => enter
 				.append("circle")
 				.attr("r", 5)
+				.attr("id", (d: any) => `id${d.id}`)
 				.attr("fill", "orange"))
+				.on("click", (event: MouseEvent, node: any) => {
+					if (_currentWiki) {
+						d3.select(`#id${_currentWiki.id}`).attr("fill", "orange");
+					}
+					_currentWiki = {
+						"id": node.id,
+						"title": node.title
+					}
+
+					d3.select(`#id${node.id}`).attr("fill", "red");
+					setCurrentWiki(_currentWiki);
+				})
 				.call(DRAG);
 
 		link = link
 			.data(links, (d: any) => `${d.source.id}\t${d.target.id}`)
 			.join("line");
+	}
+
+	async function createWiki() {
+
+		console.log(SIMULATION);
+
+		try {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/create`, {
+				method: "post",
+				credentials: "include",
+			}).then(res => res.json());
+
+			if (res.success) {
+				console.log(res);
+				const newWiki = res.data;
+				_wikies.push({
+					id: newWiki.id,
+					title: newWiki.title
+				});
+
+				// update(_wikies, _relations);
+				// setCurrentWiki(newWiki);
+
+				// if (_currentWiki) {
+				// 	d3.select(`#id${_currentWiki.id}`).attr("fill", "orange");
+				// }
+
+				// _currentWiki = newWiki;
+				// d3.select(`#id${newWiki.id}`).attr("fill", "red");
+
+			} else {
+				ToastWraper("error", res.message);
+			}
+
+		} catch (err) {
+			console.log(err);
+			ToastWraper("error", "서버가 아파요 :(");
+		}
+
 	}
 
 	useEffect(() => {
@@ -81,10 +139,7 @@ export default function Graph({
 			.on("drag", dragged)
 			.on("end", dragended);
 
-
 		async function init() {
-
-
 			/**
 			 * Wiki Node와 Link 초기화
 			 */
@@ -100,14 +155,18 @@ export default function Graph({
 					const WIDTH = document.getElementById("graph")?.clientWidth || 0;
 					const HEIGHT = document.getElementById("graph")?.clientHeight || 0;
 					SVG.attr("viewBox", [-WIDTH / 2, -HEIGHT / 2, WIDTH, HEIGHT]);
+
 				} else {
 					ToastWraper("error", res.message, "/");
 				}
 			} catch (err) {
 				ToastWraper("error", "서버가 아파요 :(", "/");
 			}
+			
 			update(_wikies, _relations);
+			return [_wikies, _relations];
 		}
+
 
 		init();
 		window.addEventListener("resize", () => {
@@ -115,12 +174,20 @@ export default function Graph({
 			const HEIGHT = document.getElementById("graph")?.clientHeight || 0;
 			SVG.attr("viewBox", [-WIDTH / 2, -HEIGHT / 2, WIDTH, HEIGHT]);
 			SIMULATION.restart();
-		})
+		});
+
 	}, [])
 
+	useEffect(() => {
+		if (!tickAddNewWiki)
+			return;
+		console.log("?");
+		// createWiki()
+		setTickAddNewWiki(!tickAddNewWiki);
+	}, [tickAddNewWiki])
 
 	return (
-		<div id="graph" className="relative flex w-full h-full">
+		<div id="graph" className="relative flex w-full h-full bg-gray-100 bg-gradient-to-tr">
 			<svg></svg>
 		</div>
 	)

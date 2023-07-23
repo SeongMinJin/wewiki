@@ -21,7 +21,11 @@ module.exports = {
     },
     fontFamily: {
       'noto': '\'Noto Sans KR\', sans-serif',
-      'abril-fatface': '\'Abril Fatface\', cursive'
+      'abril-fatface': '\'Abril Fatface\', cursive',
+      'helvetica': "'helvetica Neue', sans-serif",
+      'trial-oceanic': "'Trial Oceanic', sans-serif",
+      'noto-serif-kr': "'Noto Serif KR', serif",
+      'noto-sans-kr': "'Noto Sans KR', sans-serif",
     }
   },
   plugins: [],

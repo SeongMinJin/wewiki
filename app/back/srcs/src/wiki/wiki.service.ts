@@ -97,11 +97,7 @@ export class WikiService {
 			await this.wikiRepository.save(newWiki);
 			return {
 				"success": true,
-				"data": {
-					"created": newWiki,
-					"wikies": (await this.userService.findOneByName(name))?.wiki,
-					"relations": await this.makeRelations(name),
-				}
+				"data": newWiki,
 			}
 		}
 	}
