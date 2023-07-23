@@ -15,12 +15,14 @@ export class WikiController {
 	@Get("find/all")
 	@UseGuards(SessionGuard)
 	async findAll(@Req() req: Request) {
+		// @ts-ignore
 		return await this.wikiService.findAll(req.session?.user || "");
 	}
 
 	@Get("find/one")
 	@UseGuards(SessionGuard)
 	async findOne(@Req() req: Request, @Body() body: WikiFindOneDto) {
+		// @ts-ignore
 		return await this.wikiService.findOne(req.session.user || "", body.id)
 	}
 
@@ -28,6 +30,7 @@ export class WikiController {
 	@UseGuards(SessionGuard)
 	@HttpCode(201)
 	async createNew(@Req() req: Request) {
+		// @ts-ignore
 		return await this.wikiService.createOne(req.session.user || "");
 	}
 }

@@ -18,10 +18,12 @@ export class AuthController {
 	@UseGuards(LocalAuthGuard)
 	@Post('signin')
 	async signIn(@Req() req: Request) {
+		// @ts-ignore
 		if (req.session.user) {
 			req.session.regenerate(err => {
 				if (err) throw new HttpException({ reason: "Error on session regeneration" }, HttpStatus.INTERNAL_SERVER_ERROR);
 			});
+		// @ts-ignore
 		} else { req.session.user = req.user?.name; }
 		req.session.save(err => {
 			if (err) throw new HttpException({ reason: "Error on session save" }, HttpStatus.INTERNAL_SERVER_ERROR);
