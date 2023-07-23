@@ -1,6 +1,8 @@
 import './globals.css'
+import { ToastContainer, toast } from 'react-toastify'
+
 export const metadata = {
-  title: 'jelog',
+  title: 'wewiki',
   description: 'My Own Blog Web Site',
 }
 
@@ -23,3 +25,4 @@ export default function RootLayout({
     </html>
   )
 }
+

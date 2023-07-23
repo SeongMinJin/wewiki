@@ -5,7 +5,8 @@ import Login from "./login";
 import Section from "./section"
 import { useContext } from "react";
 import { StateContext, StateDispatchContext } from "../state";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import { redirect, useRouter } from "next/navigation";
 
 export default function Main() {
 
@@ -23,22 +24,22 @@ export default function Main() {
 			</div>
 			<Login />
 			<ToastContainer
-				position="top-right"
-				autoClose={3000}
-				hideProgressBar={false}
-				newestOnTop={false}
-				closeOnClick
-				rtl={false}
-				pauseOnFocusLoss
-				draggable
-				pauseOnHover
-				theme="colored"
-			/>
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="colored"
+      />
 		</div>
 	)
 }
 
-export function ToastWraper(type: string, message: string) {
+export function ToastWraper(type: string, message: string, path: string | null = null) {
 	switch (type) {
 		case "error":
 			return toast.error(message, {
@@ -50,6 +51,7 @@ export function ToastWraper(type: string, message: string) {
 				draggable: true,
 				progress: undefined,
 				theme: "colored",
+				onClose: () => {path ? redirect(path) : null}
 			})
 		case "warn":
 			return toast.warn(message, {
