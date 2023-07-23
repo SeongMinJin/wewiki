@@ -9,6 +9,27 @@ const Note = dynamic(() => import('./components/note'), {
 	ssr: false,
 })
 
+const _nodes = [
+	{
+		"id": 1,
+	},
+	{
+		"id": 2,
+	},
+	{
+		"id": 3,
+	},
+	{
+		"id": 4,
+	},
+	{
+		"id": 5,
+	},
+	{
+		"id": 6,
+	},
+]
+
 export interface Wiki {
 	id: number;
 	title: string;
@@ -28,14 +49,40 @@ export default function Write() {
 
 	
 	async function createNewWiki() {
+
+		setWikies([...wikies, {
+			id: 489357,
+			title: '',
+		}])
+		console.log(wikies);
+		// try {
+		// 	const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/create`, {
+		// 		method: "post",
+		// 		credentials: "include",
+		// 	}).then(res => res.json());
+
+		// 	if (res.success) {
+		// 		setCurrentWiki(res.data.created);
+		// 		const newWikies = wikies;
+		// 		newWikies.push(res.data.created);
+		// 		setWikies(newWikies);
+		// 	} else {
+		// 		ToastWraper("error", res.message);
+		// 	}
+
+		// } catch (err) {
+		// 	ToastWraper("error", "서버가 아파요 :(");
+		// }
+	}
+
+	async function initWiki() {
 		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/create`, {
-				method: "post",
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/find/all`, {
+				method: "get",
 				credentials: "include",
 			}).then(res => res.json());
 
 			if (res.success) {
-				setCurrentWiki(res.data.created);
 				setWikies(res.data.wikies);
 				setRelations(res.data.relations);
 			} else {
@@ -67,8 +114,8 @@ export default function Write() {
 		// }
 
 		async function init() {
-			await createNewWiki();
-			// await initWiki();
+			await initWiki();
+			// await createNewWiki();
 		}
 
 		setCurrentWidth(window.innerWidth);

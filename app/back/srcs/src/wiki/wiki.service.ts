@@ -23,7 +23,10 @@ export class WikiService {
 		const user = await this.userService.findOneByName(name)
 		return {
 			"success": true,
-			"data": user?.wiki,
+			"data": {
+				"wikies": user?.wiki,
+				"relations": await this.makeRelations(name)
+			}
 		}
 	}
 
