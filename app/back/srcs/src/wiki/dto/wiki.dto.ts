@@ -13,9 +13,14 @@ export class WikiSaveDto {
 	@IsInt()
 	@Min(1)
 	@Max(2147483647)
-	id: number
+	id: number;
 
 	@IsNotEmpty()
 	@IsString()
-	title: string
+	title: string;
+
+
+	@IsNotEmpty()
+	@IsString()
+	content: string;
 }

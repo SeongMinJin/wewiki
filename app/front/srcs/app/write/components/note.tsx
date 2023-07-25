@@ -1,7 +1,8 @@
 'use client'
 
 import { Editable, ReactEditor, Slate, withReact } from "slate-react";
-import React, { useCallback, useMemo } from "react";
+import { Descendant } from 'slate';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   createEditor,
   Editor,
@@ -15,6 +16,7 @@ import {
 import { withHistory } from "slate-history";
 import { BulletedListElement, OrderedListElement } from "./custom-type";
 import { Wiki } from "../page";
+import { ToastWraper } from "@/app/components/main";
 
 const SHORTCUTS = {
   '-': 'list-item',
@@ -145,7 +147,7 @@ const Element = ({ attributes, children, element }: {
   }
 }
 
-export default function Note({ 
+export default function Note({
   currentWiki,
 }: {
   currentWiki: Wiki
@@ -191,45 +193,65 @@ export default function Note({
     },
     [editor]
   )
-  const initialValue = useMemo(
-    () => {
-        const content = localStorage.getItem('content');
-        return content ? JSON.parse(content) : [
-          {
-            type: 'paragraph',
-            children: [{ text: '' }],
-          },
-        ]
-    }, []
-  )
-  
+
+  const [content, setContent] = useState<Descendant[]>([
+    {
+      type: 'paragraph',
+      children: [{ text: '' }],
+    },
+  ]);
+
+  const [rendering, setRendering] = useState<boolean>(false);
+
+  async function loadContent() {
+    setRendering(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/find/content/${currentWiki.id}`, {
+        method: "GET",
+        credentials: "include"
+      }).then(res => res.json());
+
+      if (res.success) {
+        setContent(res.data);
+      } else {
+        ToastWraper("error", res.message);
+      }
+    } catch (err) {
+      ToastWraper("error", "서버가 아파요 :(");
+    }
+    setRendering(false);
+  }
+
+  useEffect(() => {
+    loadContent();
+  }, [currentWiki]);
 
 
   return (
     <div id="content" className="relative w-full overflow-y-auto">
-      <Slate editor={editor} value={initialValue} onChange={
-        value => {
-          const isAstChange = editor.operations.some(
-            op => 'set_selection' !== op.type
-          )
-          if (isAstChange) {
-            // Save the value to Local Storage.
-            // const content = JSON.stringify(value)
-            // localStorage.setItem('content', content)
+      {
+        rendering ? 
+        <Slate editor={editor} value={content} onChange={
+          value => {
+            const isAstChange = editor.operations.some(
+              op => 'set_selection' !== op.type
+            )
+            if (isAstChange) {
+              // Save the value to Local Storage.
+              const content = JSON.stringify(value);
+              localStorage.setItem(currentWiki.id.toString(), content)
+            }
           }
-        }
-      }>
-        <Editable
-          onDOMBeforeInput={handleDOMBeforeInput}
-          renderElement={renderElement}
-          spellCheck
-          placeholder={currentWiki.title ? `당신에게 ${currentWiki.title}(이)란...` : "제목을 써 주세요."}
-          className="m-4 text-lg"
-        />
-      </Slate>
+        }>
+          <Editable
+            onDOMBeforeInput={handleDOMBeforeInput}
+            renderElement={renderElement}
+            spellCheck
+            placeholder={currentWiki.title ? `당신에게 ${currentWiki.title}(이)란...` : "제목을 써 주세요."}
+            className="m-4 text-lg"
+          />
+        </Slate> : <div>loading</div>
+      }
     </div>
-
-    
-    
   )
 }

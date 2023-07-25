@@ -22,13 +22,10 @@ export interface Relation {
 export default function Write() {
 	const [currentWiki, setCurrentWiki] = useState<Wiki | null>(null);
 	const _createWiki = useRef<() => Promise<void>>();
-	const _saveWiki = useRef<(id: number, title: string) => Promise<void>>();
-	const _closeWiki = useRef<() => Promise<void>>();
+	const _saveWiki = useRef<(id: number, title: string, content: any) => Promise<void>>();
+	const _closeWiki = useRef<() => void>();
 
 	const router = useRouter();
-
-	useEffect(() => {
-	}, []);
 
 	return (
 		<>
@@ -51,7 +48,7 @@ export default function Write() {
 								</button>
 								<div className="flex gap-x-4">
 									<button className="px-4 py-2 text-white bg-red-300 rounded-md whitespace-nowrap hover:bg-opacity-80"
-										onClick={() => { _saveWiki.current?.(currentWiki.id, currentWiki.title); }} >
+										onClick={() => { _saveWiki.current?.(currentWiki.id, currentWiki.title, localStorage.getItem(currentWiki.id.toString())); }} >
 										저장하기
 									</button>
 								</div>

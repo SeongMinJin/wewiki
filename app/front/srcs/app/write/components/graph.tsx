@@ -12,8 +12,8 @@ export default function Graph({
 }: {
 	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
 	_createWiki: MutableRefObject<(() => Promise<void>) | undefined>
-	_saveWiki: MutableRefObject<((id: number, title: string) => Promise<void>) | undefined>
-	_closeWiki: MutableRefObject<(() => void | undefined)>
+	_saveWiki: MutableRefObject<((id: number, title: string, content: any) => Promise<void>) | undefined>
+	_closeWiki: MutableRefObject<(() => void) | undefined>
 }
 ) {
 	const _wikies = useRef<Wiki[]>([]);
@@ -103,11 +103,12 @@ export default function Graph({
 
 	}
 
-	_saveWiki.current = async function (id: number, title: string) {
+	_saveWiki.current = async function (id: number, title: string, content: any) {
 		try {
 			const body = {
 				id: id,
-				title: title
+				title: title,
+				content: content
 			};
 
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/save`, {
@@ -126,7 +127,7 @@ export default function Graph({
 				};
 				ToastWraper("success", "저장 되었습니다 :)")
 				update(_wikies.current, _relations.current);
-
+				localStorage.removeItem(`${id}`);
 			} else {
 				ToastWraper("error", res.message, "/");
 			}
@@ -134,8 +135,6 @@ export default function Graph({
 		} catch (err) {
 			ToastWraper("error", "서버가 아파요 :(");
 		}
-
-		
 	}
 
 	_closeWiki.current = function() {
