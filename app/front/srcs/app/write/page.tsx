@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from "next/dynamic"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Graph from "./components/graph"
 import { ToastContainer } from "react-toastify"
@@ -23,12 +23,18 @@ export default function Write() {
 	const [title, setTitle] = useState<string>('');
 	const [currentWiki, setCurrentWiki] = useState<Wiki | null>(null);
 	const [tickAddNewWiki, setTickAddNewWiki] = useState<boolean>(false);
+
+	const _createWiki = useRef<() => Promise<void>>();
+
 	useEffect(() => {
 	}, []);
 
 	const router = useRouter();
 
 
+	useEffect(() => {
+		setTitle(currentWiki?.id.toString() || "Hello World!");
+	}, [currentWiki])
 	return (
 		<>
 			<div className="relative w-screen min-w-[350px] h-screen flex tablet:grid tablet:grid-cols-2">
@@ -48,7 +54,7 @@ export default function Write() {
 						</div>
 
 						{/* 글 작성 부분 */}
-						<Note title={title}/>
+						<Note title={currentWiki.id.toString() || "Not selected"}/>
 
 						<div className="absolute bottom-0 left-0 z-10 flex justify-between w-full px-4 py-4 text-lg shadow-2xl h-fit shadow-black font-noto">
 							<button onClick={() => router.back()} className="px-4 py-2 rounded-md whitespace-nowrap hover:bg-gray-100">
@@ -69,7 +75,7 @@ export default function Write() {
 					 * 어떤 글도 선택되지 않았을 때 새로운 위키 만들기
 					 */
 					<div id="makeNewWiki" className="relative flex items-center justify-center w-full h-full text-center cursor-pointer"
-					onClick={() => setTickAddNewWiki(!tickAddNewWiki)}>
+					onClick={() => _createWiki.current?.()}>
 						<span className="relative">
 							<span className="absolute w-3 h-3 rounded-full opacity-75 -top-2 -right-3 animate-ping bg-[orange]"></span>
 							<span className="absolute w-3 h-3 rounded-full opacity-75 -top-2 -right-3 bg-[orange]"></span>
@@ -78,7 +84,7 @@ export default function Write() {
 					</div>
 				}
 				<div className="relative hidden w-full tablet:block">
-					<Graph tickAddNewWiki={tickAddNewWiki} setTickAddNewWiki={setTickAddNewWiki} setCurrentWiki={setCurrentWiki} />
+					<Graph _createWiki={_createWiki} setCurrentWiki={setCurrentWiki} />
 				</div>
 			</div>
 			<ToastContainer

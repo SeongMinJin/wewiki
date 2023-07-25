@@ -1,32 +1,26 @@
 import * as d3 from "d3"
-import { Dispatch, MouseEvent, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, MouseEvent, MutableRefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import { Relation, Wiki } from "../page";
 import { ToastWraper } from "@/app/components/main";
 
 
 export default function Graph({
-	tickAddNewWiki,
-	setTickAddNewWiki,
 	setCurrentWiki,
-} : {
-	tickAddNewWiki: boolean,
-	setTickAddNewWiki: Dispatch<SetStateAction<boolean>>,
-	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>
+	_createWiki,
+}: {
+	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
+	_createWiki: MutableRefObject<(() => Promise<void>) | undefined>
 }
 ) {
 	const _wikies = useRef<Wiki[]>([]);
 	const _relations = useRef<Relation[]>([]);
 	const _currentWiki = useRef<Wiki>();
 	const _svg = useRef<d3.Selection<d3.BaseType, unknown, HTMLElement, any>>();
+	const _tooltip = useRef<d3.Selection<HTMLDivElement, unknown, HTMLElement, any>>();
 	const _simulation = useRef<d3.Simulation<d3.SimulationNodeDatum, undefined>>();
 	const _node = useRef<d3.Selection<d3.BaseType, unknown, SVGGElement, unknown>>();
 	const _link = useRef<d3.Selection<d3.BaseType, unknown, SVGGElement, unknown>>();
 	const _drag = useRef<d3.DragBehavior<Element, unknown, unknown>>();
-
-	// let _wikies: Wiki[] = [];
-	// let _relations: Relation[] = [];
-	// let _currentWiki: Wiki | null = null;
-	
 
 	function update(nodes: any, links: any) {
 		const old = new Map(_node.current?.data().map((d: any) => [d.id, d]));
@@ -35,34 +29,46 @@ export default function Graph({
 
 		_simulation.current?.nodes(nodes);
 		_simulation.current?.alpha(1).restart();
-		
+
 		_node.current = _node.current?.data(nodes, (d: any) => d.id)
 			.join((enter: any) => enter
 				.append("circle")
-				.attr("r", 5)
+				.attr("r", 8)
 				.attr("id", (d: any) => `id${d.id}`)
 				.attr("fill", "orange"))
-				.on("click", (event: MouseEvent, node: any) => {
-					if (_currentWiki.current) {
-						d3.select(`#id${_currentWiki.current.id}`).attr("fill", "orange");
-					}
-					_currentWiki.current = {
-						"id": node.id,
-						"title": node.title
-					}
-
-					d3.select(`#id${node.id}`).attr("fill", "red");
-
-				})
-				// @ts-ignore
-				.call(_drag.current);
+			.on("click", (event: MouseEvent, node: any) => {
+				if (_currentWiki.current) {
+					d3.select(`#id${_currentWiki.current.id}`).attr("fill", "orange");
+				}
+				const newWiki = {
+					"id": node.id,
+					"title": node.title
+				}
+				_currentWiki.current = newWiki;
+				setCurrentWiki(newWiki);
+				d3.select(`#id${node.id}`).attr("fill", "red");
+			})
+			.on("mouseover", (event: MouseEvent, node: any) => {
+				_tooltip.current?.style("opacity", 1);
+				d3.select(`#id${node.id}`).style("stroke", "black").style("stroke-width", 2);
+			})
+			.on("mousemove", (event: MouseEvent, node: any) => {
+				_tooltip.current?.
+				style("left", `${event.clientX}px`)
+				.style("top", `${event.clientY}px`)
+				.html(node.id);
+			})
+			.on("mouseleave", (event: MouseEvent, node: any) => {
+				d3.select(`#id${node.id}`).style("stroke", "none");
+			})
+			// @ts-ignore
+			.call(_drag.current);
 
 		_link.current = _link.current?.data(links, (d: any) => `${d.source.id}\t${d.target.id}`)
 			.join("line");
 	}
 
-	async function createWiki() {
-
+	_createWiki.current = async function createWiki() {
 		try {
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/create`, {
 				method: "post",
@@ -71,19 +77,23 @@ export default function Graph({
 
 			if (res.success) {
 
-				_wikies.current.push({
+				const newWiki = {
 					"id": res.data.id,
 					"title": res.data.title
-				});
-
+				}
+				_wikies.current.push(newWiki);
 				update(_wikies.current, _relations.current);
+
+				d3.select(`#id${newWiki.id}`).attr("fill", "red");
+				d3.select(`#id${_currentWiki.current?.id}`).attr("fill", "orange");
+				_currentWiki.current = newWiki;
+				setCurrentWiki(newWiki);
 
 			} else {
 				ToastWraper("error", res.message);
 			}
 
 		} catch (err) {
-			console.log(err);
 			ToastWraper("error", "서버가 아파요 :(");
 		}
 
@@ -91,6 +101,16 @@ export default function Graph({
 
 	useEffect(() => {
 		_svg.current = d3.select("svg");
+		_tooltip.current = d3.select("#graph").append("div")
+			.style("opacity", 0)
+			.style("background-color", "white")
+			.style("border", "solid")
+			.style("border-width", "2px")
+			.style("border-radius", "5px")
+			.style("padding", "5px")
+			.style("position", "absolute")
+			.style("z-index", 10)
+
 		_simulation.current = d3.forceSimulation()
 			.force("charge", d3.forceManyBody().strength(-50))
 			.force("collide", d3.forceCollide(20))
@@ -105,24 +125,24 @@ export default function Graph({
 			_node.current?.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
 			_link.current?.attr("x1", (d: any) => d.source.x).attr("y1", (d: any) => d.source.y).attr("x2", (d: any) => d.target.x).attr("y2", (d: any) => d.target.y);
 		}
-	
+
 		function dragstarted(event: any) {
 			if (!event.active) _simulation.current?.alphaTarget(0.3).restart();
 			event.subject.fx = event.subject.x;
 			event.subject.fy = event.subject.y;
 		}
-	
+
 		function dragged(event: any) {
 			event.subject.fx = event.x;
 			event.subject.fy = event.y;
 		}
-	
+
 		function dragended(event: any) {
 			if (!event.active) _simulation.current?.alphaTarget(0);
 			event.subject.fx = null;
 			event.subject.fy = null;
 		}
-	
+
 		_drag.current = d3.drag()
 			.on("start", dragstarted)
 			.on("drag", dragged)
@@ -136,7 +156,7 @@ export default function Graph({
 				const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/find/all`, {
 					credentials: "include",
 				}).then(res => res.json());
-	
+
 				if (res.success) {
 					_wikies.current = res.data.wikies;
 					_relations.current = res.data.relations;
@@ -151,7 +171,7 @@ export default function Graph({
 			} catch (err) {
 				ToastWraper("error", "서버가 아파요 :(");
 			}
-			
+
 			update(_wikies.current, _relations.current);
 		}
 
@@ -165,13 +185,6 @@ export default function Graph({
 		});
 
 	}, [])
-
-	useEffect(() => {
-		if (!tickAddNewWiki)
-			return;
-		createWiki();
-		setTickAddNewWiki(!tickAddNewWiki);
-	}, [tickAddNewWiki])
 
 	return (
 		<div id="graph" className="relative flex w-full h-full bg-gray-100 bg-gradient-to-tr">
