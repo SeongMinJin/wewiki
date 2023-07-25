@@ -101,4 +101,22 @@ export class WikiService {
 			}
 		}
 	}
+
+	async save(name: string, id: number, title: string) {
+		const user = await this.userService.findOneByName(name);
+
+		const wiki = user?.wiki.find(wiki => wiki.id === id);
+		if (!wiki) {
+			throw new HttpException({
+				"success": false,
+				"message": "존재하지 않는 위키입니다."
+			}, HttpStatus.NOT_FOUND)
+		}
+
+		wiki.title = title;
+		await this.wikiRepository.save(wiki);
+		return {
+			success: true
+		}
+	}
 }

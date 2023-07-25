@@ -24,7 +24,7 @@ async function bootstrap(): Promise<void> {
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: `http://localhost:3000`,
-    methods: ["POST", "GET"],
+    methods: ["POST", "GET", "PATCH"],
     credentials: true,
   });
   await app.listen(3001);

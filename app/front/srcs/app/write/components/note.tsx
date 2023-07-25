@@ -14,6 +14,7 @@ import {
 
 import { withHistory } from "slate-history";
 import { BulletedListElement, OrderedListElement } from "./custom-type";
+import { Wiki } from "../page";
 
 const SHORTCUTS = {
   '-': 'list-item',
@@ -21,9 +22,6 @@ const SHORTCUTS = {
   '#': 'heading-one',
   '##': 'heading-two',
 }
-
-
-
 
 const withShortcuts = (editor: Editor) => {
   const { deleteBackward, insertText } = editor
@@ -147,9 +145,10 @@ const Element = ({ attributes, children, element }: {
   }
 }
 
-
-export default function Note({ title }: {
-  title: string,
+export default function Note({ 
+  currentWiki,
+}: {
+  currentWiki: Wiki
 }) {
 
   const renderElement = useCallback((props: any) => <Element {...props} />, [])
@@ -205,6 +204,7 @@ export default function Note({ title }: {
   )
   
 
+
   return (
     <div id="content" className="relative w-full overflow-y-auto">
       <Slate editor={editor} value={initialValue} onChange={
@@ -214,8 +214,8 @@ export default function Note({ title }: {
           )
           if (isAstChange) {
             // Save the value to Local Storage.
-            const content = JSON.stringify(value)
-            localStorage.setItem('content', content)
+            // const content = JSON.stringify(value)
+            // localStorage.setItem('content', content)
           }
         }
       }>
@@ -223,10 +223,13 @@ export default function Note({ title }: {
           onDOMBeforeInput={handleDOMBeforeInput}
           renderElement={renderElement}
           spellCheck
-          placeholder={`내 인생에서 ${title}(이)란...`}
-          className="text-lg m-4"
+          placeholder={currentWiki.title ? `당신에게 ${currentWiki.title}(이)란...` : "제목을 써 주세요."}
+          className="m-4 text-lg"
         />
       </Slate>
     </div>
+
+    
+    
   )
 }

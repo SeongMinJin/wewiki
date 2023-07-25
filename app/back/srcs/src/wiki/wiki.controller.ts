@@ -1,9 +1,9 @@
-import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { Wiki } from './entity/wiki.entity';
 import { WikiService } from './wiki.service';
 import { Request } from 'express';
 import { SessionGuard } from './guard/wiki.session.guard';
-import { WikiFindOneDto } from './dto/wiki.dto';
+import { WikiFindOneDto, WikiSaveDto } from './dto/wiki.dto';
 
 @Controller('wiki')
 export class WikiController {
@@ -32,5 +32,14 @@ export class WikiController {
 	async createNew(@Req() req: Request) {
 		// @ts-ignore
 		return await this.wikiService.createOne(req.session.user || "");
+	}
+
+
+	@Patch("save")
+	@UseGuards(SessionGuard)
+	@HttpCode(201)
+	async save(@Req() req: Request, @Body() body: WikiSaveDto) {
+		// @ts-ignore
+		return await this.wikiService.save(req.session.user || "", body.id, body.title);
 	}
 }

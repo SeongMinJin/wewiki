@@ -7,9 +7,13 @@ import { ToastWraper } from "@/app/components/main";
 export default function Graph({
 	setCurrentWiki,
 	_createWiki,
+	_saveWiki,
+	_closeWiki,
 }: {
 	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
 	_createWiki: MutableRefObject<(() => Promise<void>) | undefined>
+	_saveWiki: MutableRefObject<((id: number, title: string) => Promise<void>) | undefined>
+	_closeWiki: MutableRefObject<(() => void | undefined)>
 }
 ) {
 	const _wikies = useRef<Wiki[]>([]);
@@ -68,7 +72,7 @@ export default function Graph({
 			.join("line");
 	}
 
-	_createWiki.current = async function createWiki() {
+	_createWiki.current = async function () {
 		try {
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/create`, {
 				method: "post",
@@ -99,8 +103,50 @@ export default function Graph({
 
 	}
 
+	_saveWiki.current = async function (id: number, title: string) {
+		try {
+			const body = {
+				id: id,
+				title: title
+			};
+
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/save`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify(body),
+			}).then(res => res.json());
+
+			if (res.success) {
+				const wiki = _wikies.current.find(wiki => wiki.id === id);
+				if (wiki) {
+					wiki.title = title;
+				};
+				ToastWraper("success", "저장 되었습니다 :)")
+				update(_wikies.current, _relations.current);
+
+			} else {
+				ToastWraper("error", res.message, "/");
+			}
+
+		} catch (err) {
+			ToastWraper("error", "서버가 아파요 :(");
+		}
+
+		
+	}
+
+	_closeWiki.current = function() {
+
+		d3.select(`#id${_currentWiki.current?.id}`).style("fill", "orange");
+		_currentWiki.current = undefined;
+		setCurrentWiki(null);
+	}
+
 	useEffect(() => {
-		_svg.current = d3.select("svg");
+		_svg.current = d3.select("#svg");
 		_tooltip.current = d3.select("#graph").append("div")
 			.style("opacity", 0)
 			.style("background-color", "white")
@@ -188,7 +234,7 @@ export default function Graph({
 
 	return (
 		<div id="graph" className="relative flex w-full h-full bg-gray-100 bg-gradient-to-tr">
-			<svg></svg>
+			<svg id="svg"></svg>
 		</div>
 	)
 }
