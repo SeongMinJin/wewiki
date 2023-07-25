@@ -2,7 +2,7 @@
 
 import { Editable, ReactEditor, Slate, withReact } from "slate-react";
 import { Descendant } from 'slate';
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { Children, useCallback, useEffect, useMemo, useState } from "react";
 import {
   createEditor,
   Editor,
@@ -201,7 +201,19 @@ export default function Note({
     },
   ]);
 
-  const [rendering, setRendering] = useState<boolean>(false);
+  const [rendering, setRendering] = useState<boolean>(true);
+
+  // const initialValue = useMemo(() => {
+  //   const content = localStorage.getItem(`${currentWiki.id}`);
+  //   if (content) {
+  //     return JSON.parse(content);
+  //   }
+  //   return [{
+  //     type: 'paragraph',
+  //     children: [{text: ""}]
+  //   }]
+  // }, [currentWiki])
+
 
   async function loadContent() {
     setRendering(true);
@@ -212,7 +224,10 @@ export default function Note({
       }).then(res => res.json());
 
       if (res.success) {
-        setContent(res.data);
+        setContent(res.data ? JSON.parse(res.data) : [{
+          type: "paragraph",
+          children: [{text: ""}]
+        }]);
       } else {
         ToastWraper("error", res.message);
       }
@@ -226,11 +241,11 @@ export default function Note({
     loadContent();
   }, [currentWiki]);
 
-
   return (
     <div id="content" className="relative w-full overflow-y-auto">
       {
         rendering ? 
+        <div>loading</div> :
         <Slate editor={editor} value={content} onChange={
           value => {
             const isAstChange = editor.operations.some(
@@ -250,7 +265,7 @@ export default function Note({
             placeholder={currentWiki.title ? `당신에게 ${currentWiki.title}(이)란...` : "제목을 써 주세요."}
             className="m-4 text-lg"
           />
-        </Slate> : <div>loading</div>
+        </Slate>
       }
     </div>
   )
