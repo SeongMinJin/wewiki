@@ -24,6 +24,7 @@ export default function Graph({
 	const _simulation = useRef<d3.Simulation<d3.SimulationNodeDatum, undefined>>();
 	const _node = useRef<d3.Selection<d3.BaseType, unknown, SVGGElement, unknown>>();
 	const _link = useRef<d3.Selection<d3.BaseType, unknown, SVGGElement, unknown>>();
+	const _text = useRef<d3.Selection<d3.BaseType, unknown, SVGGElement, unknown>>();
 	const _drag = useRef<d3.DragBehavior<Element, unknown, unknown>>();
 
 	function update(nodes: any, links: any) {
@@ -32,6 +33,7 @@ export default function Graph({
 		links = links.map((d: any) => Object.assign({}, d));
 
 		_simulation.current?.nodes(nodes);
+		_simulation.current?.force("link", d3.forceLink(links).id((d: any) => d.id).distance(50));
 		_simulation.current?.alpha(1).restart();
 
 		_node.current = _node.current?.data(nodes, (d: any) => d.id)
@@ -53,14 +55,8 @@ export default function Graph({
 				d3.select(`#id${node.id}`).attr("fill", "red");
 			})
 			.on("mouseover", (event: MouseEvent, node: any) => {
-				_tooltip.current?.style("opacity", 1);
+				// _tooltip.current?.style("opacity", 1);
 				d3.select(`#id${node.id}`).style("stroke", "black").style("stroke-width", 2);
-			})
-			.on("mousemove", (event: MouseEvent, node: any) => {
-				_tooltip.current?.
-				style("left", `${event.clientX}px`)
-				.style("top", `${event.clientY}px`)
-				.html(node.id);
 			})
 			.on("mouseleave", (event: MouseEvent, node: any) => {
 				d3.select(`#id${node.id}`).style("stroke", "none");
@@ -115,7 +111,7 @@ export default function Graph({
 			const body = {
 				id: id,
 				title: title,
-				content: content
+				content: "asdasdas"
 			};
 
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/save`, {
@@ -133,6 +129,55 @@ export default function Graph({
 					wiki.title = title;
 				};
 				ToastWraper("success", "저장 되었습니다 :)")
+				_relations.current.push({
+					source: 10,
+					target: 11,
+				});
+				_relations.current.push({
+					source: 10,
+					target: 18,
+				});
+				_relations.current.push({
+					source: 10,
+					target: 14,
+				});
+				_relations.current.push({
+					source: 10,
+					target: 16,
+				});
+				_relations.current.push({
+					source: 10,
+					target: 19,
+				});
+				_relations.current.push({
+					source: 10,
+					target: 23,
+				});
+				_relations.current.push({
+					source: 10,
+					target: 24,
+				});
+				_relations.current.push({
+					source: 10,
+					target: 17,
+				});
+				_relations.current.push({
+					source: 15,
+					target: 12,
+				});
+				_relations.current.push({
+					source: 15,
+					target: 13,
+				});
+				_relations.current.push({
+					source: 15,
+					target: 9,
+				});
+				_relations.current.push({
+					source: 10,
+					target: 15,
+				});
+
 				update(_wikies.current, _relations.current);
 				localStorage.removeItem(`${id}`);
 			} else {
@@ -145,7 +190,6 @@ export default function Graph({
 	}
 
 	_closeWiki.current = function() {
-
 		d3.select(`#id${_currentWiki.current?.id}`).style("fill", "orange");
 		_currentWiki.current = undefined;
 		setCurrentWiki(null);
@@ -153,29 +197,33 @@ export default function Graph({
 
 	useEffect(() => {
 		_svg.current = d3.select("#svg");
-		_tooltip.current = d3.select("#graph").append("div")
-			.style("opacity", 0)
-			.style("background-color", "white")
-			.style("border", "solid")
-			.style("border-width", "2px")
-			.style("border-radius", "5px")
-			.style("padding", "5px")
-			.style("position", "absolute")
-			.style("z-index", 10)
+
+		// _tooltip.current = d3.select("#graph").append("div")
+		// 	.style("opacity", 0)
+		// 	.style("background-color", "white")
+		// 	.style("border", "solid")
+		// 	.style("border-width", "2px")
+		// 	.style("border-radius", "5px")
+		// 	.style("padding", "5px")
+		// 	.style("position", "absolute")
+		// 	.style("z-index", 10)
 
 		_simulation.current = d3.forceSimulation()
-			.force("charge", d3.forceManyBody().strength(-50))
-			.force("collide", d3.forceCollide(20))
-			.force("x", d3.forceX())
-			.force("y", d3.forceY())
-			.on("tick", ticked);
+		.force("charge", d3.forceManyBody())
+		.force("x", d3.forceX())
+		.force("y", d3.forceY())
+		.on("tick", ticked);
 
 		_node.current = _svg.current.append("g").selectAll("circle");
-		_link.current = _svg.current.append("g").selectAll("line");
+		_link.current = _svg.current.append("g").attr("stroke", "#000").attr("stroke-width", 1.5).selectAll("line");
+		_text.current = _svg.current.append("g").selectAll("text");
 
+
+		const textOffset = 10;
 		function ticked() {
-			_node.current?.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
 			_link.current?.attr("x1", (d: any) => d.source.x).attr("y1", (d: any) => d.source.y).attr("x2", (d: any) => d.target.x).attr("y2", (d: any) => d.target.y);
+			_node.current?.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
+			_text.current?.attr("x", (d: any) => d.x + textOffset).attr("y", (d: any) => d.y + textOffset);
 		}
 
 		function dragstarted(event: any) {

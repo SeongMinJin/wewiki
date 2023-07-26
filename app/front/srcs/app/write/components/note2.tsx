@@ -13,12 +13,16 @@ export default function Note2() {
 	useEffect(() => {
 		const editor = new Quill('#editor', {
 			modules: {
-				toolbar: false,    // Snow includes toolbar by default
+				toolbar: false,
 			},
 			theme: "snow"
 		});
-		new QuillMarkdown(editor);
-	
+		const quillMarkdown = new QuillMarkdown(editor);
+
+
+		return () => {
+			quillMarkdown.destroy();
+		}
 	}, []);
 
 	return (
