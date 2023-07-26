@@ -5,9 +5,10 @@ import { useState, useEffect, useRef } from "react"
 import Graph from "./components/graph"
 import { ToastContainer } from "react-toastify"
 import { useRouter } from "next/navigation"
-const Note = dynamic(() => import('./components/note'), {
-	ssr: false,
-})
+import Note2 from "./components/note2"
+// const Note = dynamic(() => import('./components/note'), {
+// 	ssr: false,
+// })
 
 export interface Wiki {
 	id: number;
@@ -33,7 +34,7 @@ export default function Write() {
 				{
 					currentWiki ?
 
-						<div className="relative flex flex-col w-full h-full pb-20 phone:pt-8 phone:px-12">
+						<div className="relative flex flex-col w-full h-screen pb-28 phone:pt-8 phone:px-12">
 							<input value={currentWiki.title} onChange={e => {
 								setCurrentWiki({ ...currentWiki, title: e.target.value });
 							}} className="w-full font-noto font-semibold p-4 text-[230%] focus:outline-none" type="text" placeholder="제목을 입력하세요" />
@@ -41,7 +42,11 @@ export default function Write() {
 								<div className="mb-4 bg-black bg-opacity-70 w-16 h-[6px]"></div>
 							</div>
 
-							<Note currentWiki={currentWiki} />
+							{/* <Note currentWiki={currentWiki} _saveWiki={_saveWiki} /> */}
+							<Note2 />
+							
+
+							
 							<div className="absolute bottom-0 left-0 z-10 flex justify-between w-full px-4 py-4 text-lg shadow-2xl h-fit shadow-black font-noto">
 								<button onClick={() => router.back()} className="px-4 py-2 rounded-md whitespace-nowrap hover:bg-gray-100">
 									⬅ 나가기

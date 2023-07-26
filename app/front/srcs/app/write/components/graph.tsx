@@ -104,6 +104,13 @@ export default function Graph({
 	}
 
 	_saveWiki.current = async function (id: number, title: string, content: any) {
+
+		if (!title) {
+			ToastWraper("warn", "제목을 입력해주세요.");
+			return;
+		}
+
+
 		try {
 			const body = {
 				id: id,
@@ -112,7 +119,7 @@ export default function Graph({
 			};
 
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/save`, {
-				method: "PATCH",
+				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 				},

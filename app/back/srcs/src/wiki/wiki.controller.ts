@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { Wiki } from './entity/wiki.entity';
 import { WikiService } from './wiki.service';
 import { Request } from 'express';
@@ -43,7 +43,7 @@ export class WikiController {
 	}
 
 
-	@Patch("save")
+	@Put("save")
 	@UseGuards(SessionGuard)
 	@HttpCode(201)
 	async save(@Req() req: Request, @Body() body: WikiSaveDto) {

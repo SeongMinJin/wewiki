@@ -2,7 +2,7 @@
 
 import { Editable, ReactEditor, Slate, withReact } from "slate-react";
 import { Descendant } from 'slate';
-import React, { Children, useCallback, useEffect, useMemo, useState } from "react";
+import React, { Children, MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   createEditor,
   Editor,
@@ -149,15 +149,19 @@ const Element = ({ attributes, children, element }: {
 
 export default function Note({
   currentWiki,
+  _saveWiki,
 }: {
-  currentWiki: Wiki
+  currentWiki: Wiki,
+  _saveWiki: MutableRefObject<((id: number, title: string, content: any) => Promise<void>) | undefined>
 }) {
 
   const renderElement = useCallback((props: any) => <Element {...props} />, [])
-  const editor = useMemo(
-    () => withShortcuts(withReact(withHistory(createEditor()))),
-    []
-  )
+  // const [editor] = useState(() => );
+
+  const editorRef = useRef<Editor>();
+  if (!editorRef.current) editorRef.current = withShortcuts(withReact(withHistory(createEditor())));
+  const editor = editorRef.current;
+
   const handleDOMBeforeInput = useCallback(
     (e: InputEvent) => {
       queueMicrotask(() => {
@@ -194,26 +198,10 @@ export default function Note({
     [editor]
   )
 
-  const [content, setContent] = useState<Descendant[]>([
-    {
-      type: 'paragraph',
-      children: [{ text: '' }],
-    },
-  ]);
+  const [content, setContent] = useState<Descendant[]>([]);
 
   const [rendering, setRendering] = useState<boolean>(true);
-
-  // const initialValue = useMemo(() => {
-  //   const content = localStorage.getItem(`${currentWiki.id}`);
-  //   if (content) {
-  //     return JSON.parse(content);
-  //   }
-  //   return [{
-  //     type: 'paragraph',
-  //     children: [{text: ""}]
-  //   }]
-  // }, [currentWiki])
-
+  const timerId = useRef<NodeJS.Timeout>();
 
   async function loadContent() {
     setRendering(true);
@@ -224,10 +212,15 @@ export default function Note({
       }).then(res => res.json());
 
       if (res.success) {
-        setContent(res.data ? JSON.parse(res.data) : [{
-          type: "paragraph",
-          children: [{text: ""}]
-        }]);
+        setContent(res.data ?
+          JSON.parse(res.data) :
+          [
+            {
+              type: "paragraph",
+              children: [{ text: "" }]
+            }
+          ]
+        );
       } else {
         ToastWraper("error", res.message);
       }
@@ -239,33 +232,35 @@ export default function Note({
 
   useEffect(() => {
     loadContent();
-  }, [currentWiki]);
+  }, [currentWiki.id]);
 
   return (
     <div id="content" className="relative w-full overflow-y-auto">
       {
-        rendering ? 
-        <div>loading</div> :
-        <Slate editor={editor} value={content} onChange={
-          value => {
-            const isAstChange = editor.operations.some(
-              op => 'set_selection' !== op.type
-            )
-            if (isAstChange) {
-              // Save the value to Local Storage.
-              const content = JSON.stringify(value);
-              localStorage.setItem(currentWiki.id.toString(), content)
+        rendering ?
+          <></> :
+          <Slate editor={editor} value={content} onChange={
+            value => {
+              if (timerId.current) {
+                clearTimeout(timerId.current);
+              }
+              const isAstChange = editor.operations.some(op => 'set_selection' !== op.type)
+              if (isAstChange) {
+                timerId.current = setTimeout(() => {
+                  const content = JSON.stringify(value);
+                  _saveWiki.current?.(currentWiki.id, currentWiki.title, content);
+                }, 1000);
+              }
             }
-          }
-        }>
-          <Editable
-            onDOMBeforeInput={handleDOMBeforeInput}
-            renderElement={renderElement}
-            spellCheck
-            placeholder={currentWiki.title ? `당신에게 ${currentWiki.title}(이)란...` : "제목을 써 주세요."}
-            className="m-4 text-lg"
-          />
-        </Slate>
+          }>
+            <Editable
+              onDOMBeforeInput={handleDOMBeforeInput}
+              renderElement={renderElement}
+              spellCheck
+              placeholder={currentWiki.title ? `당신에게 ${currentWiki.title}(이)란...` : "제목을 써 주세요."}
+              className="m-4 text-lg"
+            />
+          </Slate>
       }
     </div>
   )
