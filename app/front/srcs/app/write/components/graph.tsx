@@ -20,7 +20,6 @@ export default function Graph({
 	const _relations = useRef<Relation[]>([]);
 	const _currentWiki = useRef<Wiki>();
 	const _svg = useRef<d3.Selection<d3.BaseType, unknown, HTMLElement, any>>();
-	const _tooltip = useRef<d3.Selection<HTMLDivElement, unknown, HTMLElement, any>>();
 	const _simulation = useRef<d3.Simulation<d3.SimulationNodeDatum, undefined>>();
 	const _node = useRef<d3.Selection<d3.BaseType, unknown, SVGGElement, unknown>>();
 	const _link = useRef<d3.Selection<d3.BaseType, unknown, SVGGElement, unknown>>();
@@ -29,12 +28,18 @@ export default function Graph({
 
 	function update(nodes: any, links: any) {
 		const old = new Map(_node.current?.data().map((d: any) => [d.id, d]));
+
 		nodes = nodes.map((d: any) => Object.assign(old.get(d.id) || {}, d));
 		links = links.map((d: any) => Object.assign({}, d));
 
 		_simulation.current?.nodes(nodes);
 		_simulation.current?.force("link", d3.forceLink(links).id((d: any) => d.id).distance(50));
 		_simulation.current?.alpha(1).restart();
+
+		_text.current = _node.current?.data(nodes, (d: any) => d.title)
+			.join((enter: any) => enter
+				.append("text")
+				.text((d: any) => d.title));
 
 		_node.current = _node.current?.data(nodes, (d: any) => d.id)
 			.join((enter: any) => enter
@@ -55,7 +60,6 @@ export default function Graph({
 				d3.select(`#id${node.id}`).attr("fill", "red");
 			})
 			.on("mouseover", (event: MouseEvent, node: any) => {
-				// _tooltip.current?.style("opacity", 1);
 				d3.select(`#id${node.id}`).style("stroke", "black").style("stroke-width", 2);
 			})
 			.on("mouseleave", (event: MouseEvent, node: any) => {
@@ -197,16 +201,6 @@ export default function Graph({
 
 	useEffect(() => {
 		_svg.current = d3.select("#svg");
-
-		// _tooltip.current = d3.select("#graph").append("div")
-		// 	.style("opacity", 0)
-		// 	.style("background-color", "white")
-		// 	.style("border", "solid")
-		// 	.style("border-width", "2px")
-		// 	.style("border-radius", "5px")
-		// 	.style("padding", "5px")
-		// 	.style("position", "absolute")
-		// 	.style("z-index", 10)
 
 		_simulation.current = d3.forceSimulation()
 		.force("charge", d3.forceManyBody())
