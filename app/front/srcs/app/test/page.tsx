@@ -20,8 +20,8 @@ export default function Test() {
 
 		// The force simulation mutates links and nodes, so create a copy
 		// so that re-evaluating this cell produces the same result.
-		const links = data.links.map(d => ({ ...d }));
-		const nodes = data.nodes.map(d => ({ ...d }));
+		let links = data.links.map(d => ({ ...d }));
+		let nodes = data.nodes.map(d => ({ ...d }));
 
 		const svg = d3.select("#container").append("svg")
 			.attr("width", width)
@@ -98,9 +98,26 @@ export default function Test() {
 
 		update({nodes, links});
 
-	});
+	// 	setInterval(() => {
+	// 		const id = Date.now().toString();
+	// 		nodes.push({
+	// 			id: id,
+	// 			group: 1
+	// 		});
+
+	// 		links.push({
+	// 			source: id,
+	// 			target: "Javert",
+	// 			"value": 1
+	// 		});
+
+	// 		update({nodes, links});
+	// 	}, 1000)
+	// });
 
 	return (
-		<div className="w-full h-screen bg-red-200" id="container"></div>
+		<div className="w-full h-screen bg-red-200" id="container">
+			<button id="add"> 노드 추가</button>
+		</div>
 	)
 }
