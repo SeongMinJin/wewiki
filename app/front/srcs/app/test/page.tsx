@@ -113,7 +113,7 @@ export default function Test() {
 
 	// 		update({nodes, links});
 	// 	}, 1000)
-	// });
+	});
 
 	return (
 		<div className="w-full h-screen bg-red-200" id="container">
