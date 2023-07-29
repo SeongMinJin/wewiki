@@ -46,11 +46,10 @@ export default function Graph({
 			_wikies.current.push(newWiki);
 			_update.current(_wikies.current, _relations.current);
 			setCurrentWiki(newWiki);
+			ToastWraper("success", "생성되었습니다.")
 		} catch {
 			ToastWraper("error", "서버가 아파요 :(", "/");
 		}
-
-
 	}
 
 	_deleteWiki.current = async function (id: number) {
@@ -81,6 +80,8 @@ export default function Graph({
 			ToastWraper("error", "서버가 아파요 :(")
 		}
 	}
+
+	
 
 	useEffect(() => {
 		async function init() {
@@ -230,14 +231,6 @@ export default function Graph({
 		}
 		init();
 	}, [])
-
-
-
-
-
-
-
-
 
 
 	return (
