@@ -142,4 +142,17 @@ export class WikiService {
 			success: true
 		}
 	}
+
+	async remove(name: string, id: number) {
+		const user = await this.userService.findOneByName(name);
+		const wiki = user?.wiki.find(wiki => wiki.id === id);
+
+		if (!wiki) {
+			throw new HttpException({
+				"success": false,
+				"message": "존재하지 않는 위키입니다."
+			}, HttpStatus.NOT_FOUND)
+		}
+		await this.wikiRepository.remove(wiki);
+	}
 }

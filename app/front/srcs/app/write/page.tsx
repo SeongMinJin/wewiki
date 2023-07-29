@@ -1,11 +1,11 @@
 'use client'
 
-import dynamic from "next/dynamic"
-import { useState, useEffect, useRef } from "react"
-import Graph from "./components/graph"
+import { useState, useRef } from "react"
 import { ToastContainer } from "react-toastify"
 import { useRouter } from "next/navigation"
-import Note2 from "./components/note2"
+import Graph from "./components/graph"
+import 'react-toastify/dist/ReactToastify.css';
+
 // const Note = dynamic(() => import('./components/note'), {
 // 	ssr: false,
 // })
@@ -24,7 +24,7 @@ export default function Write() {
 	const [currentWiki, setCurrentWiki] = useState<Wiki | null>(null);
 	const _createWiki = useRef<() => Promise<void>>();
 	const _saveWiki = useRef<(id: number, title: string, content: any) => Promise<void>>();
-	const _closeWiki = useRef<() => void>();
+	const _deleteWiki = useRef<(id: number) => Promise<void>>();
 
 	const router = useRouter();
 
@@ -37,13 +37,13 @@ export default function Write() {
 						<div className="relative flex flex-col w-full h-screen pb-28 phone:pt-8 phone:px-12">
 							<input value={currentWiki.title} onChange={e => {
 								setCurrentWiki({ ...currentWiki, title: e.target.value });
-							}} className="w-full font-noto font-semibold p-4 text-[230%] focus:outline-none" type="text" placeholder="제목을 입력하세요" />
+							}} className="w-full font-noto font-semibold p-4 text-[230%] focus:outline-none" type="text" placeholder={`${currentWiki.id}`} />
 							<div className="w-full p-4">
 								<div className="mb-4 bg-black bg-opacity-70 w-16 h-[6px]"></div>
 							</div>
 
 							{/* <Note currentWiki={currentWiki} _saveWiki={_saveWiki} /> */}
-							<Note2 />
+							
 							
 
 							
@@ -52,13 +52,12 @@ export default function Write() {
 									⬅ 나가기
 								</button>
 								<div className="flex gap-x-4">
-									<button className="px-4 py-2 text-white bg-red-300 rounded-md whitespace-nowrap hover:bg-opacity-80"
-										onClick={() => { _saveWiki.current?.(currentWiki.id, currentWiki.title, localStorage.getItem(currentWiki.id.toString())); }} >
-										저장하기
+									<button className="px-4 py-2 text-white bg-red-500 rounded-md whitespace-nowrap hover:bg-opacity-80" onClick={() => _deleteWiki.current?.(currentWiki.id)}>
+										삭제하기
 									</button>
 								</div>
 							</div>
-							<button className="absolute top-5 right-5" onClick={() => _closeWiki.current?.()}>
+							<button className="absolute top-5 right-5" onClick={() => setCurrentWiki(null)}>
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
 									<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
 								</svg>
@@ -77,8 +76,8 @@ export default function Write() {
 							</span>
 						</div>
 				}
-				<div className="relative hidden w-full tablet:block">
-					<Graph _createWiki={_createWiki} _saveWiki={_saveWiki} _closeWiki={_closeWiki} setCurrentWiki={setCurrentWiki} />
+				<div className="relative hidden w-full h-screen tablet:block">
+					<Graph _createWiki={_createWiki} _saveWiki={_saveWiki} _deleteWiki={_deleteWiki} setCurrentWiki={setCurrentWiki} />
 				</div>
 			</div>
 			<ToastContainer

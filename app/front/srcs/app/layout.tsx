@@ -1,5 +1,4 @@
 import './globals.css'
-import { ToastContainer, toast } from 'react-toastify'
 
 export const metadata = {
   title: 'wewiki',

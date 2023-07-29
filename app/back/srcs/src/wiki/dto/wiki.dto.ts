@@ -24,3 +24,11 @@ export class WikiSaveDto {
 	@IsString()
 	content: string;
 }
+
+export class WikiDeleteDto {
+	@IsNotEmpty()
+	@IsInt()
+	@Min(1)
+	@Max(2147483647)
+	id: number;
+}

@@ -6,7 +6,8 @@ import Section from "./section"
 import { useContext } from "react";
 import { StateContext, StateDispatchContext } from "../state";
 import { ToastContainer, toast } from "react-toastify";
-import { redirect, useRouter } from "next/navigation";
+import 'react-toastify/dist/ReactToastify.css';
+import { redirect } from "next/navigation";
 
 export default function Main() {
 

@@ -11,7 +11,7 @@ export class AuthController {
 	constructor(
 		private userService: UserService,
 		private authService: AuthService,
-	){}
+	) { }
 
 
 	@HttpCode(200)
@@ -23,7 +23,7 @@ export class AuthController {
 			req.session.regenerate(err => {
 				if (err) throw new HttpException({ reason: "Error on session regeneration" }, HttpStatus.INTERNAL_SERVER_ERROR);
 			});
-		// @ts-ignore
+			// @ts-ignore
 		} else { req.session.user = req.user?.name; }
 		req.session.save(err => {
 			if (err) throw new HttpException({ reason: "Error on session save" }, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -38,7 +38,7 @@ export class AuthController {
 	@Get('signout')
 	signOut(@Req() req: Request) {
 		req.session.destroy(err => {
-			if (err) throw new HttpException({ reason: "Error on session destroy"}, HttpStatus.INTERNAL_SERVER_ERROR);
+			if (err) throw new HttpException({ reason: "Error on session destroy" }, HttpStatus.INTERNAL_SERVER_ERROR);
 		});
 	}
 

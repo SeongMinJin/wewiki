@@ -1,9 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
-import { Wiki } from './entity/wiki.entity';
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { WikiService } from './wiki.service';
 import { Request } from 'express';
 import { SessionGuard } from './guard/wiki.session.guard';
-import { WikiFindOneDto, WikiSaveDto } from './dto/wiki.dto';
+import { WikiDeleteDto, WikiFindOneDto, WikiSaveDto } from './dto/wiki.dto';
 
 @Controller('wiki')
 export class WikiController {
@@ -16,7 +15,7 @@ export class WikiController {
 	@UseGuards(SessionGuard)
 	async findAll(@Req() req: Request) {
 		// @ts-ignore
-		return await this.wikiService.findAll(req.session?.user || "");
+		return await this.wikiService.findAll(req.session.user);
 	}
 
 	@Get("find/one")
@@ -49,5 +48,13 @@ export class WikiController {
 	async save(@Req() req: Request, @Body() body: WikiSaveDto) {
 		// @ts-ignore
 		return await this.wikiService.save(req.session.user || "", body.id, body.title, body.content);
+	}
+
+	@Delete("remove")
+	@UseGuards(SessionGuard)
+	@HttpCode(204)
+	async remove(@Req() req: Request, @Body() body: WikiDeleteDto) {
+		// @ts-ignore
+		return await this.wikiService.remove(req.session.user, body.id);
 	}
 }

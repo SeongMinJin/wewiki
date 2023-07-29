@@ -29,7 +29,7 @@ export default function Test() {
 			.attr("viewBox", [-width / 2, -height / 2, width, height]);
 
 		const simulation = d3.forceSimulation()
-			.force("charge", d3.forceManyBody().strength(-1000))
+			.force("charge", d3.forceManyBody().strength(-500))
 			.force("link", d3.forceLink().id(d => d.id).distance(10))
 			.force("x", d3.forceX())
 			.force("y", d3.forceY())
@@ -37,13 +37,12 @@ export default function Test() {
 
 		let link = svg.append("g")
 			.attr("stroke", "#000")
-			.attr("stroke-width", 1.5)
+			.attr("stroke-width", 1)
+			.attr("stroke-opacity", 0.2)
 			.selectAll("line");
 
 		let node = svg.append("g")
 			.selectAll("g");
-		// .attr("stroke", "#fff")
-		// .attr("stroke-width", 1.5)
 
 
 		function ticked() {
@@ -57,10 +56,28 @@ export default function Test() {
 				.attr("x", d => d.x + 3)
 				.attr("y", d => d.y + 3);
 
-			link.attr("x1", d => d.source.x)
+			link
+				.attr("x1", d => d.source.x)
 				.attr("y1", d => d.source.y)
 				.attr("x2", d => d.target.x)
 				.attr("y2", d => d.target.y);
+		}
+
+		function dragstarted(event: any) {
+			if (!event.active) simulation.alphaTarget(0.3).restart();
+			event.subject.fx = event.subject.x;
+			event.subject.fy = event.subject.y;
+		}
+
+		function dragged(event: any) {
+			event.subject.fx = event.x;
+			event.subject.fy = event.y;
+		}
+
+		function dragended(event: any) {
+			if (!event.active) simulation.alphaTarget(0);
+			event.subject.fx = null;
+			event.subject.fy = null;
 		}
 
 		function update({ nodes, links }) {
@@ -89,35 +106,32 @@ export default function Test() {
 						.style("stroke", "gray")
 						.style("stroke-width", 1);
 					return g;
-				});
+				})
+				.on("mouseover", (e, d) => {
+					link.style("stroke-opacity", (l) => d === l.source || d === l.target ? 1 : 0.05);
+					link.style("stroke-width", 2);
+				})
+				.on("mouseout", d => {
+					link.style("stroke-opacity", 0.2);
+					link.style("stroke-width", 1);
+				})
+				.call(
+					d3.drag()
+						.on("start", dragstarted)
+						.on("drag", dragged)
+						.on("end", dragended)
+				);
 
 			link = link
 				.data(links, d => `${d.source.id}\t${d.target.id}`)
 				.join("line");
 		}
 
-		update({nodes, links});
-
-	// 	setInterval(() => {
-	// 		const id = Date.now().toString();
-	// 		nodes.push({
-	// 			id: id,
-	// 			group: 1
-	// 		});
-
-	// 		links.push({
-	// 			source: id,
-	// 			target: "Javert",
-	// 			"value": 1
-	// 		});
-
-	// 		update({nodes, links});
-	// 	}, 1000)
+		update({ nodes, links });
 	});
 
 	return (
 		<div className="w-full h-screen bg-red-200" id="container">
-			<button id="add"> 노드 추가</button>
 		</div>
 	)
 }
