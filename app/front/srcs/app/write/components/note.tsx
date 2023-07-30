@@ -57,11 +57,6 @@ export default function Note({
     });
 
     editor.current?.on("text-change", (delta, oldDelta, source) => {
-
-      if (delta.ops.find(elem => elem.insert === '@')) {
-        
-      }
-
       const value = editor.current?.root.innerHTML;
 
       if (timerId.current?.get(currentWiki.id)) {
