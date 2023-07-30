@@ -97,7 +97,7 @@ export default function Graph({
 			}).then(res => res.json());
 
 			if (!res.success) {
-				ToastWraper("error", res.message);
+				ToastWraper("error", res.message, "/");
 				return;
 			}
 
@@ -114,7 +114,7 @@ export default function Graph({
 			ToastWraper("success", "저장되었습니다.");
 
 		} catch {
-
+			ToastWraper("error", "서버가 아파요 :(");
 		}
 	}
 
@@ -128,7 +128,7 @@ export default function Graph({
 				}).then(res => res.json());
 
 				if (!res.success) {
-					ToastWraper("error", res.message);
+					ToastWraper("error", res.message, "/");
 					return;
 				}
 				_wikies.current = res.data.wikies;

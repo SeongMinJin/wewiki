@@ -56,7 +56,12 @@ export default function Note({
       },
     });
 
-    editor.current?.on("text-change", () => {
+    editor.current?.on("text-change", (delta, oldDelta, source) => {
+
+      if (delta.ops.find(elem => elem.insert === '@')) {
+        
+      }
+
       const value = editor.current?.root.innerHTML;
 
       if (timerId.current?.get(currentWiki.id)) {
@@ -68,8 +73,8 @@ export default function Note({
       }, 2500);
 
       timerId.current?.set(currentWiki.id, id);
-    })
-  
+    });
+
     const markdown = new QuillMarkdown(editor.current);
     loadContent();
     return (() => {
@@ -80,6 +85,8 @@ export default function Note({
 
 
   return (
-    <div id="editor" className="relative w-full overflow-y-auto h-fit"></div>
+    <>
+      <div id="editor" className="relative w-full overflow-y-auto h-fit"></div>
+    </>
   )
 }
