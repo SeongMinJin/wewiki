@@ -16,8 +16,6 @@ export default function Note({
   currentWiki: Wiki,
   _saveWiki: MutableRefObject<((id: number, body : {title?: string, content?: string}) => Promise<void>) | undefined>
 }) {
-
-  const [value, setValue] = useState<string>("")
   const timerId = useRef<Map<number, NodeJS.Timeout>>(new Map());
 
   async function loadContent() {
@@ -41,6 +39,9 @@ export default function Note({
   const editor = useRef<Quill>();
 
   useEffect(() => {
+  }, []);
+
+  useEffect(() => {
     editor.current = new Quill("#editor", {
       theme: "snow",
       modules: {
@@ -55,32 +56,30 @@ export default function Note({
       },
     });
 
+    editor.current?.on("text-change", () => {
+      const value = editor.current?.root.innerHTML;
+
+      if (timerId.current?.get(currentWiki.id)) {
+        clearTimeout(timerId.current?.get(currentWiki.id));
+      }
+
+      const id = setTimeout(() => {
+        _saveWiki.current?.(currentWiki.id, { content: value });
+      }, 2500);
+
+      timerId.current?.set(currentWiki.id, id);
+    })
+  
     const markdown = new QuillMarkdown(editor.current);
+    loadContent();
     return (() => {
       document.querySelector(".ql-toolbar")?.remove();
       markdown.destroy();
     });
-  }, []);
-
-  useEffect(() => {
-    loadContent();
   }, [currentWiki])
 
 
   return (
     <div id="editor" className="relative w-full overflow-y-auto h-fit"></div>
-    // <ReactQuill theme="snow" value={value} onChange={(value: string) => {
-    //   setValue(value);
-
-    //   if (timerId.current?.get(currentWiki.id)) {
-    //     clearTimeout(timerId.current?.get(currentWiki.id));
-    //   }
-
-    //   const id = setTimeout(() => {
-    //     _saveWiki.current?.(currentWiki.id, { content: value });
-    //   }, 2500);
-
-    //   timerId.current?.set(currentWiki.id, id);
-    // }}/>
   )
 }
