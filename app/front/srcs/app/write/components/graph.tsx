@@ -15,7 +15,7 @@ export default function Graph({
 }: {
 	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
 	_createWiki: MutableRefObject<(() => Promise<void>) | undefined>
-	_saveWiki: MutableRefObject<((id: number, title: string, content: any) => Promise<void>) | undefined>
+	_saveWiki: MutableRefObject<((id: number, body: { title?: string, content?: string }) => Promise<void>) | undefined>
 	_deleteWiki: MutableRefObject<((id: number) => Promise<void>) | undefined>
 }
 ) {
@@ -78,6 +78,43 @@ export default function Graph({
 		} catch (err) {
 			console.log(err);
 			ToastWraper("error", "서버가 아파요 :(")
+		}
+	}
+
+	_saveWiki.current = async function (id: number, body: { title?: string, content?: string }) {
+		try {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/save`, {
+				method: "PATCH",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({
+					id: id,
+					title: body.title || null,
+					content: body.content || null
+				})
+			}).then(res => res.json());
+
+			if (!res.success) {
+				ToastWraper("error", res.message);
+				return;
+			}
+
+			if (body.title) {
+				const wiki = _wikies.current.find(wiki => wiki.id === id);
+
+				if (wiki) {
+					wiki.title = body.title;
+					_update.current(_wikies.current, _relations.current);
+					d3.select(`#id${id}`).select("text").text(body.title);
+				}
+			}
+
+			ToastWraper("success", "저장되었습니다.");
+
+		} catch {
+
 		}
 	}
 
@@ -183,7 +220,7 @@ export default function Graph({
 							.attr("r", 8)
 							.attr("fill", d => color(d.id));
 						g.append("text")
-							.text(d => d.id)
+							.text(d => d.title)
 							.attr("class", "fill-white")
 							.attr("font-size", "1.5em")
 							.style("stroke", "gray")

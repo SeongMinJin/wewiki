@@ -22,15 +22,14 @@ export class WikiController {
 	@UseGuards(SessionGuard)
 	async findOne(@Req() req: Request, @Body() body: WikiFindOneDto) {
 		// @ts-ignore
-		return await this.wikiService.findOne(req.session.user || "", body.id)
+		return await this.wikiService.findOne(req.session.user, body.id);
 	}
 
 	@Get("find/content/:id")
 	@UseGuards(SessionGuard)
 	async findContent(@Req() req:Request, @Param("id") id: number) {
-
 		// @ts-ignore
-		return await this.wikiService.findContent(req.session.user || "", id);
+		return await this.wikiService.findContent(req.session.user, id);
 	}
 
 	@Post("create")
@@ -42,12 +41,12 @@ export class WikiController {
 	}
 
 
-	@Put("save")
+	@Patch("save")
 	@UseGuards(SessionGuard)
 	@HttpCode(201)
 	async save(@Req() req: Request, @Body() body: WikiSaveDto) {
 		// @ts-ignore
-		return await this.wikiService.save(req.session.user || "", body.id, body.title, body.content);
+		return await this.wikiService.save(req.session.user, body);
 	}
 
 	@Delete("remove")

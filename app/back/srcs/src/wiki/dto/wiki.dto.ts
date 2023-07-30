@@ -15,14 +15,9 @@ export class WikiSaveDto {
 	@Max(2147483647)
 	id: number;
 
-	@IsNotEmpty()
-	@IsString()
-	title: string;
+	title: string | null;
 
-
-	@IsNotEmpty()
-	@IsString()
-	content: string;
+	content: string | null;
 }
 
 export class WikiDeleteDto {

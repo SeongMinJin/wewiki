@@ -1,9 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wiki } from './entity/wiki.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entity/user.entity';
+import { WikiSaveDto } from './dto/wiki.dto';
 
 @Injectable()
 export class WikiService {
@@ -39,9 +40,19 @@ export class WikiService {
 	 * 생각하기 때문에.
 	 */
 	async findOne(name: string, id: number) {
+		const user = await this.userService.findOneByName(name);
+		const wiki = user?.wiki.find(wiki => wiki.id === id);
+
+		if (!wiki) {
+			throw new HttpException({
+				"success": false,
+				"message": "존재하지 않는 위키입니다."
+			}, HttpStatus.NOT_FOUND)
+		}
+
 		return {
 			"success": true,
-			"data": await this.findOneByUser(await this.userService.findOneByName(name), id),
+			"data": wiki,
 		}
 	}
 
@@ -64,6 +75,7 @@ export class WikiService {
 	async findContent(name: string, id: string) {
 		const user = await this.userService.findOneByName(name);
 		const wiki = user?.wiki.find(wiki => wiki.id === parseInt(id));
+
 		if (!wiki) {
 			throw new HttpException({
 				"success": false,
@@ -124,10 +136,10 @@ export class WikiService {
 		}
 	}
 
-	async save(name: string, id: number, title: string, content: string) {
+	async save(name: string, body: WikiSaveDto) {
 		const user = await this.userService.findOneByName(name);
 
-		const wiki = user?.wiki.find(wiki => wiki.id === id);
+		const wiki = user?.wiki.find(wiki => wiki.id === body.id);
 		if (!wiki) {
 			throw new HttpException({
 				"success": false,
@@ -135,9 +147,14 @@ export class WikiService {
 			}, HttpStatus.NOT_FOUND)
 		}
 
-		wiki.title = title;
-		wiki.content = content;
+		if (body.title)
+			wiki.title = body.title;
+
+		if (body.content)
+			wiki.content = body.content;
+
 		await this.wikiRepository.save(wiki);
+
 		return {
 			success: true
 		}
