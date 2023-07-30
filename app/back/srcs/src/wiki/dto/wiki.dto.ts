@@ -15,7 +15,7 @@ export class WikiSaveDto {
 	@Max(2147483647)
 	id: number;
 
-	title: string | null;
+	value: string | null;
 
 	content: string | null;
 }

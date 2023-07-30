@@ -18,7 +18,7 @@ export class Wiki {
 	refer: Wiki[];
 
 	@Column()
-	title: string;
+	value: string;
 
 	// need to be modified
 	@Column({

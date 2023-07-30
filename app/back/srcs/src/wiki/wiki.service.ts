@@ -126,7 +126,7 @@ export class WikiService {
 		if (user) {
 			const newWiki = this.wikiRepository.create({
 				owner: user,
-				title: "",
+				value: "제목",
 			});
 			await this.wikiRepository.save(newWiki);
 			return {
@@ -147,8 +147,8 @@ export class WikiService {
 			}, HttpStatus.NOT_FOUND)
 		}
 
-		if (body.title)
-			wiki.title = body.title;
+		if (body.value)
+			wiki.value = body.value;
 
 		if (body.content)
 			wiki.content = body.content;

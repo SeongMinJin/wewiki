@@ -12,14 +12,18 @@ export default function Graph({
 	_createWiki,
 	_saveWiki,
 	_deleteWiki,
+	_connectWiki,
+	_wikies
 }: {
 	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
 	_createWiki: MutableRefObject<(() => Promise<void>) | undefined>
-	_saveWiki: MutableRefObject<((id: number, body: { title?: string, content?: string }) => Promise<void>) | undefined>
+	_saveWiki: MutableRefObject<((id: number, body: { value?: string, content?: string }) => Promise<void>) | undefined>
 	_deleteWiki: MutableRefObject<((id: number) => Promise<void>) | undefined>
+	_connectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>
+	_wikies: MutableRefObject<Wiki[]>
 }
 ) {
-	const _wikies = useRef<Wiki[]>([]);
+	// const _wikies = useRef<Wiki[]>([]);
 	const _relations = useRef<Relation[]>([]);
 	const _update = useRef<(nodes, links) => void>();
 	const _currentWiki = useRef<Wiki>();
@@ -41,7 +45,7 @@ export default function Graph({
 			}
 			const newWiki = {
 				id: res.data.id,
-				title: res.data.title
+				value: res.data.value
 			};
 			_wikies.current.push(newWiki);
 			_update.current(_wikies.current, _relations.current);
@@ -81,7 +85,7 @@ export default function Graph({
 		}
 	}
 
-	_saveWiki.current = async function (id: number, body: { title?: string, content?: string }) {
+	_saveWiki.current = async function (id: number, body: { value?: string, content?: string }) {
 		try {
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/save`, {
 				method: "PATCH",
@@ -91,7 +95,7 @@ export default function Graph({
 				},
 				body: JSON.stringify({
 					id: id,
-					title: body.title || null,
+					value: body.value || null,
 					content: body.content || null
 				})
 			}).then(res => res.json());
@@ -101,13 +105,13 @@ export default function Graph({
 				return;
 			}
 
-			if (body.title) {
+			if (body.value) {
 				const wiki = _wikies.current.find(wiki => wiki.id === id);
 
 				if (wiki) {
-					wiki.title = body.title;
+					wiki.value = body.value;
 					_update.current(_wikies.current, _relations.current);
-					d3.select(`#id${id}`).select("text").text(body.title);
+					d3.select(`#id${id}`).select("text").text(body.value);
 				}
 			}
 
@@ -118,7 +122,13 @@ export default function Graph({
 		}
 	}
 
-	
+	_connectWiki.current = async function (source: number, target: number) {
+		_relations.current.push({
+			source: source,
+			target: target
+		});
+		_update.current?.(_wikies.current, _relations.current);
+	}
 
 	useEffect(() => {
 		async function init() {
@@ -220,7 +230,7 @@ export default function Graph({
 							.attr("r", 8)
 							.attr("fill", d => color(d.id));
 						g.append("text")
-							.text(d => d.title)
+							.text(d => d.value)
 							.attr("class", "fill-white")
 							.attr("font-size", "1.5em")
 							.style("stroke", "gray")
@@ -238,7 +248,7 @@ export default function Graph({
 					.on("click", (e, d) => {
 						const newWiki = {
 							id: d.id,
-							title: d.title
+							value: d.value
 						};
 						setCurrentWiki(newWiki);
 					})

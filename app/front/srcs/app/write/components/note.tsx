@@ -1,20 +1,27 @@
+// @ts-nocheck
 "use client"
 
-import { MutableRefObject, useEffect, useRef, useState } from "react"
-import ReactQuill from "react-quill";
+import QuillMarkdown from "quilljs-markdown";
+import { MutableRefObject, useEffect, useRef } from "react"
 import 'react-quill/dist/quill.snow.css';
+import "quill-mention";
 import { Wiki } from "../page";
 import { ToastWraper } from "@/app/components/main";
 import Quill from "quill";
-// @ts-ignore
-import QuillMarkdown from "quilljs-markdown";
+import "quill-mention/dist/quill.mention.css"
 
 export default function Note({
   currentWiki,
+  setCurrentWiki,
   _saveWiki,
+  _connectWiki,
+  _wikies,
 }: {
   currentWiki: Wiki,
-  _saveWiki: MutableRefObject<((id: number, body : {title?: string, content?: string}) => Promise<void>) | undefined>
+  setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
+  _saveWiki: MutableRefObject<((id: number, body: { value?: string, content?: string }) => Promise<void>) | undefined>,
+	_connectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
+  _wikies: MutableRefObject<Wiki[]>
 }) {
   const timerId = useRef<Map<number, NodeJS.Timeout>>(new Map());
 
@@ -39,6 +46,7 @@ export default function Note({
   const editor = useRef<Quill>();
 
   useEffect(() => {
+    // window.addEventListener('mention-clicked', (event) => setCurrentWiki({ id: event.value.id, value: event.value.value }), false);
   }, []);
 
   useEffect(() => {
@@ -48,15 +56,40 @@ export default function Note({
         toolbar: [
           [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
           ['blockquote', 'code-block'],
-          ['bold', 'italic', 'underline', 'strike', 'link', 'image'], 
+          ['bold', 'italic', 'underline', 'strike', 'link', 'image'],
           [{ 'color': [] }, { 'background': [] }],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
           [{ 'align': [] }],
-        ]
+        ],
+        mention: {
+          allowedChars: /^[A-Za-z0-9_ㄱ-ㅎ가-힣 ]*$/,
+          mentionDenotationChars: ["@"],
+          source: function (searchTerm, renderList, mentionChar) {
+            let values;
+
+            if (mentionChar === "@") {
+              values = _wikies.current?.filter(wiki => wiki.value !== currentWiki.value);
+            } else {
+              return;
+            }
+
+            if (searchTerm.length === 0) {
+              renderList(values, searchTerm);
+            } else {
+              const matches = [];
+              for (let i = 0; i < values.length; i++)
+                if (
+                  ~values[i].value.toLowerCase().indexOf(searchTerm.toLowerCase())
+                )
+                  matches.push(values[i]);
+              renderList(matches, searchTerm);
+            }
+          }
+        }
       },
     });
 
-    editor.current?.on("text-change", (delta, oldDelta, source) => {
+    editor.current?.on("text-change", () => {
       const value = editor.current?.root.innerHTML;
 
       if (timerId.current?.get(currentWiki.id)) {
@@ -70,18 +103,41 @@ export default function Note({
       timerId.current?.set(currentWiki.id, id);
     });
 
+
+    const targetNode = document.querySelector(".ql-editor");
+    const config = { attribues: false, childList: true, subtree: true };
+
+    const callback = (mutationList) => {
+      for (const elem of mutationList) {
+        if (elem.addedNodes) {
+          if (elem.addedNodes[0] instanceof HTMLSpanElement) {
+            _connectWiki.current?.(currentWiki.id, parseInt(elem.addedNodes[0].getAttribute("data-id")));
+          }
+        } else  {
+          if (elem.removedNodes[0] instanceof HTMLSpanElement) {
+            elem.removedNodes[0].attributes.getNamedItem("data-id");
+          }
+        }
+      }
+    };
+
+    // 콜백 함수에 연결된 감지기 인스턴스 생성
+    const observer = new MutationObserver(callback);
+
+    // 설정한 변경의 감지 시작
+    observer.observe(targetNode, config);
+
     const markdown = new QuillMarkdown(editor.current);
     loadContent();
     return (() => {
       document.querySelector(".ql-toolbar")?.remove();
       markdown.destroy();
+      observer.disconnect();
     });
   }, [currentWiki])
 
 
   return (
-    <>
-      <div id="editor" className="relative w-full overflow-y-auto h-fit"></div>
-    </>
+    <div id="editor" className="relative w-full overflow-y-auto h-fit"></div>
   )
 }
