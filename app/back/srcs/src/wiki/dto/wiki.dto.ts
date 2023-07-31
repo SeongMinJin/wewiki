@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsString, Max, Min } from "class-validator";
+import { IsInt, IsNotEmpty, Max, Min } from "class-validator";
 
 export class WikiFindOneDto {
 	@IsNotEmpty()
@@ -26,4 +26,32 @@ export class WikiDeleteDto {
 	@Min(1)
 	@Max(2147483647)
 	id: number;
+}
+
+export class WikiConnectDto {
+	@IsNotEmpty()
+	@IsInt()
+	@Min(1)
+	@Max(2147483647)
+	source: number;
+
+	@IsNotEmpty()
+	@IsInt()
+	@Min(1)
+	@Max(2147483647)
+	target: number;
+}
+
+export class WikiDisconnectDto {
+	@IsNotEmpty()
+	@IsInt()
+	@Min(1)
+	@Max(2147483647)
+	source: number;
+
+	@IsNotEmpty()
+	@IsInt()
+	@Min(1)
+	@Max(2147483647)
+	target: number;
 }

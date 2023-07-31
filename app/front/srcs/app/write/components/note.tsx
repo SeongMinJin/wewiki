@@ -15,12 +15,14 @@ export default function Note({
   setCurrentWiki,
   _saveWiki,
   _connectWiki,
+  _disconnectWiki,
   _wikies,
 }: {
   currentWiki: Wiki,
   setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
   _saveWiki: MutableRefObject<((id: number, body: { value?: string, content?: string }) => Promise<void>) | undefined>,
 	_connectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
+	_disconnectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
   _wikies: MutableRefObject<Wiki[]>
 }) {
   const timerId = useRef<Map<number, NodeJS.Timeout>>(new Map());
@@ -68,7 +70,7 @@ export default function Note({
             let values;
 
             if (mentionChar === "@") {
-              values = _wikies.current?.filter(wiki => wiki.value !== currentWiki.value);
+              values = _wikies.current?.filter(wiki => wiki.id !== currentWiki.id);
             } else {
               return;
             }
@@ -109,14 +111,18 @@ export default function Note({
 
     const callback = (mutationList) => {
       for (const elem of mutationList) {
-        if (elem.addedNodes) {
+        if (elem.addedNodes.length) {
           if (elem.addedNodes[0] instanceof HTMLSpanElement) {
             _connectWiki.current?.(currentWiki.id, parseInt(elem.addedNodes[0].getAttribute("data-id")));
           }
-        } else  {
+          continue;
+        } 
+
+        if (elem.removedNodes.length) {
           if (elem.removedNodes[0] instanceof HTMLSpanElement) {
-            elem.removedNodes[0].attributes.getNamedItem("data-id");
+            _disconnectWiki.current?.(currentWiki.id, parseInt(elem.removedNodes[0].getAttribute("data-id")));
           }
+          continue;
         }
       }
     };

@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Put, Req, Session, UseGuards } from '@nestjs/common';
 import { WikiService } from './wiki.service';
 import { Request } from 'express';
 import { SessionGuard } from './guard/wiki.session.guard';
-import { WikiDeleteDto, WikiFindOneDto, WikiSaveDto } from './dto/wiki.dto';
+import { WikiConnectDto, WikiDeleteDto, WikiDisconnectDto, WikiFindOneDto, WikiSaveDto } from './dto/wiki.dto';
 
 @Controller('wiki')
 export class WikiController {
@@ -40,7 +40,6 @@ export class WikiController {
 		return await this.wikiService.createOne(req.session.user || "");
 	}
 
-
 	@Patch("save")
 	@UseGuards(SessionGuard)
 	@HttpCode(201)
@@ -55,5 +54,21 @@ export class WikiController {
 	async remove(@Req() req: Request, @Body() body: WikiDeleteDto) {
 		// @ts-ignore
 		return await this.wikiService.remove(req.session.user, body.id);
+	}
+
+	@Post("connect")
+	@UseGuards(SessionGuard)
+	@HttpCode(201)
+	async connect(@Req() req: Request, @Body() body: WikiConnectDto) {
+		// @ts-ignore
+		return await this.wikiService.connect(req.session.user, body.source, body.target);
+	}
+
+	@Delete("disconnect")
+	@UseGuards(SessionGuard)
+	@HttpCode(204)
+	async disconnect(@Req() req: Request, @Body() body: WikiDisconnectDto) {
+		// @ts-ignore
+		return await this.wikiService.disconnect(req.session.user, body.source, body.target);
 	}
 }

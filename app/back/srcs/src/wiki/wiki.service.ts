@@ -1,4 +1,4 @@
-import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpCode, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wiki } from './entity/wiki.entity';
 import { Repository } from 'typeorm';
@@ -172,4 +172,53 @@ export class WikiService {
 		}
 		await this.wikiRepository.remove(wiki);
 	}
+
+
+	async connect(name: string, source: number, target: number) {
+		const user = await this.userService.findOneByName(name);
+		const sourceWiki = user?.wiki.find(wiki => wiki.id === source);
+		const targetWiki = user?.wiki.find(wiki => wiki.id === target);
+
+		if (!sourceWiki || !targetWiki) {
+			throw new HttpException({
+				"success": false,
+				"message": "존재하지 않는 위키입니다."
+			}, HttpStatus.NOT_FOUND);
+		}
+
+		if (sourceWiki.refer.find(wiki => wiki.id === target) || targetWiki.refer.find(wiki => wiki.id === source)) {
+			return ({
+				"success": false,
+				"message": "이미 연결된 위키입니다."
+			});
+		}
+
+		sourceWiki.refer.push(targetWiki);
+		await this.wikiRepository.save(sourceWiki);
+		return ({
+			"success": true
+		});
+	}
+
+	async disconnect(name: string, source: number, target: number) {
+		const user = await this.userService.findOneByName(name);
+		const sourceWiki = user?.wiki.find(wiki => wiki.id === source);
+		const targetWiki = user?.wiki.find(wiki => wiki.id === target);
+
+		if (!sourceWiki || !targetWiki) {
+			throw new NotFoundException;
+		}
+
+		const sourceIndex = sourceWiki.refer.findIndex(wiki => wiki.id === target);
+		const targetIndex = targetWiki.refer.findIndex(wiki => wiki.id === source);
+
+		if (sourceIndex !== -1) {
+			sourceWiki.refer.splice(sourceIndex, 1);
+			await this.wikiRepository.save(sourceWiki);
+		} else if (targetIndex !== -1) {
+			targetWiki.refer.splice(targetIndex, 1);
+			await this.wikiRepository.save(targetWiki);
+		}
+	}
+
 }

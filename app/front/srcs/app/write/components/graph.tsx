@@ -13,6 +13,7 @@ export default function Graph({
 	_saveWiki,
 	_deleteWiki,
 	_connectWiki,
+	_disconnectWiki,
 	_wikies
 }: {
 	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
@@ -20,20 +21,21 @@ export default function Graph({
 	_saveWiki: MutableRefObject<((id: number, body: { value?: string, content?: string }) => Promise<void>) | undefined>
 	_deleteWiki: MutableRefObject<((id: number) => Promise<void>) | undefined>
 	_connectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>
+	_disconnectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>
 	_wikies: MutableRefObject<Wiki[]>
 }
 ) {
 	// const _wikies = useRef<Wiki[]>([]);
 	const _relations = useRef<Relation[]>([]);
 	const _update = useRef<(nodes, links) => void>();
-	const _currentWiki = useRef<Wiki>();
+	// const _currentWiki = useRef<Wiki>();
 	// const _svg = useRef<d3.Selection<d3.BaseType, unknown, HTMLElement, any>>();
 	// const _simulation = useRef<d3.Simulation<d3.SimulationNodeDatum, undefined>>();
 	// const _node = useRef<d3.Selection<d3.BaseType, unknown, SVGGElement, unknown>>();
 	// const _link = useRef<d3.Selection<d3.BaseType, unknown, SVGGElement, unknown>>();
 
 
-	_createWiki.current = async function() {
+	_createWiki.current = async function () {
 		try {
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/create`, {
 				method: "POST",
@@ -73,7 +75,7 @@ export default function Graph({
 			}
 
 			_wikies.current.splice(_wikies.current.findIndex(wiki => wiki.id === id), 1);
-			for(let index = _relations.current.findIndex(relation => relation.source === id || relation.target === id); index !== -1; index = _relations.current.findIndex(relation => relation.source === id || relation.target === id)) {
+			for (let index = _relations.current.findIndex(relation => relation.source === id || relation.target === id); index !== -1; index = _relations.current.findIndex(relation => relation.source === id || relation.target === id)) {
 				_relations.current.splice(index, 1);
 			}
 			_update.current(_wikies.current, _relations.current);
@@ -123,11 +125,93 @@ export default function Graph({
 	}
 
 	_connectWiki.current = async function (source: number, target: number) {
-		_relations.current.push({
-			source: source,
-			target: target
-		});
-		_update.current?.(_wikies.current, _relations.current);
+
+		if (_relations.current.find(relation => (relation.source === source && relation.target === target) || (relation.source === target && relation.target === source))) {
+			return;
+		}
+
+		try {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/connect`, {
+				method: "POST",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({
+					source: source,
+					target: target
+				})
+			}).then(res => {
+				if (res.status === 404) {
+					ToastWraper("error", "존재하지 않는 위키입니다.")
+					return res.json();
+				}
+
+				if (res.status === 401) {
+					ToastWraper("error", "로그인 해주세요.", "/");
+					return res.json();
+				}
+
+				if (res.status === 500) {
+					ToastWraper("error", "서버가 아파요 :(", "/");
+				}
+
+				return res.json();
+			});
+
+			if (res.success) {
+				_relations.current.push({
+					source: source,
+					target: target
+				});
+				_update.current?.(_wikies.current, _relations.current);
+				return;
+			}
+
+		} catch {
+			ToastWraper("error", "서버가 아파요 :(");
+		}
+	}
+
+	_disconnectWiki.current = async function (source: number, target: number) {
+		if (document.querySelectorAll(`[data-id="${target}"]`).length) {
+			return;
+		}
+
+		try {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/disconnect`, {
+				method: "DELETE",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({
+					source: source,
+					target: target
+				})
+			}).then(res => res);
+
+			if (res.status === 404) {
+				ToastWraper("error", "존재하지 않는 위키입니다.");
+				return;
+			}
+
+			if (res.status === 401) {
+				ToastWraper("error", "로그인 해주세요.", "/");
+				return;
+			}
+
+			if (res.status === 500) {
+				ToastWraper("error", "서버가 아파요 :(", "/");
+				return;
+			}
+
+			_relations.current.splice(_relations.current.findIndex(relation => (relation.source === source && relation.target) || (relation.source === target && relation.target === source)), 1);
+			_update.current?.(_wikies.current, _relations.current);
+
+		} catch {
+			ToastWraper("error", "서버가 아파요 :(");
+		}
 	}
 
 	useEffect(() => {
