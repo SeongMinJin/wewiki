@@ -143,7 +143,6 @@ export default function Graph({
 				})
 			}).then(res => {
 				if (res.status === 404) {
-					ToastWraper("error", "존재하지 않는 위키입니다.")
 					return res.json();
 				}
 

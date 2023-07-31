@@ -25,7 +25,7 @@ export default function Note({
 	_disconnectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
   _wikies: MutableRefObject<Wiki[]>
 }) {
-  const timerId = useRef<Map<number, NodeJS.Timeout>>(new Map());
+  const timerId = useRef<Map<number, NodeJS.Timeout>>(new Map<number, NOdeJS.Timeout>());
 
   async function loadContent() {
     try {

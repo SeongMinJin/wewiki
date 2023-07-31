@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import Graph from "./components/graph"
 import 'react-toastify/dist/ReactToastify.css';
 import dynamic from "next/dynamic"
+import { ToastWraper } from "../components/main"
 const Note = dynamic(() => import('./components/note'), {
 	ssr: false,
 })
@@ -28,7 +29,7 @@ export default function Write() {
 	const _connectWiki = useRef<(target: number, source: number) => Promise<void>>();
 	const _disconnectWiki = useRef<(target: number, source: number) => Promise<void>>();
 	const _wikies = useRef<Wiki[]>([]);
-	const timerId = useRef<NodeJS.Timeout>();
+	const timerId = useRef<Map<number, NodeJS.Timeout>>(new Map<number, NodeJS.Timeout>());
 
 	const router = useRouter();
 
@@ -40,13 +41,22 @@ export default function Write() {
 
 						<div className="relative flex flex-col w-full h-screen pb-28 phone:pt-8 phone:px-12">
 							<input value={currentWiki.value} onChange={e => {
-								setCurrentWiki({ ...currentWiki, value: e.target.value });
-								if (timerId.current) {
-									clearTimeout(timerId.current);
+								const value = e.target.value;
+								setCurrentWiki({ ...currentWiki, value: value });
+
+								if (timerId.current?.get(currentWiki.id)) {
+									clearTimeout(timerId.current?.get(currentWiki.id));
 								}
-								timerId.current = setTimeout(() => {
-									_saveWiki.current?.(currentWiki.id, { value: e.target.value });
-								}, 1500);
+
+								const id = setTimeout(() => {
+									if (value === "") {
+										ToastWraper("warn", "제목을 써주세요.");
+										return;
+									}
+									_saveWiki.current?.(currentWiki.id, { value: value });
+								}, 1000);
+								timerId.current?.set(currentWiki.id, id);
+
 							}} className="w-full font-noto font-semibold p-4 text-[230%] focus:outline-none" type="text" placeholder={`제목을 써주세요.`} />
 							<div className="w-full p-4">
 								<div className="mb-4 bg-black bg-opacity-70 w-16 h-[6px]"></div>
