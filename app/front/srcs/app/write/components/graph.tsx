@@ -177,6 +177,7 @@ export default function Graph({
 			return;
 		}
 
+
 		try {
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/disconnect`, {
 				method: "DELETE",
@@ -191,7 +192,6 @@ export default function Graph({
 			}).then(res => res);
 
 			if (res.status === 404) {
-				ToastWraper("error", "존재하지 않는 위키입니다.");
 				return;
 			}
 
