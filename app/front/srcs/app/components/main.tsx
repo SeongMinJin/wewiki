@@ -3,7 +3,7 @@
 import Nav from "./nav"
 import Login from "./login";
 import Section from "./section"
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { StateContext, StateDispatchContext } from "../state";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,6 +13,23 @@ export default function Main() {
 
 	const state = useContext(StateContext);
 	const dispatch = useContext(StateDispatchContext);
+
+	const check = async function() {
+		const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/check`, {
+			method: "GET",
+			credentials: "include"
+		}).then(res => res.json());
+
+		if (!res.success) {
+			return;
+		}
+		dispatch({type: "login"});
+
+	}
+
+	useEffect(() => {
+		check();
+	}, [])
 
 	return (
 		<div id="root" className="relative w-screen min-w-[300px] min-h-screen flex justify-center px-6" onClick={(e: any) => {

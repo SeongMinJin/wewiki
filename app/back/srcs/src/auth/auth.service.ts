@@ -14,5 +14,13 @@ export class AuthService {
 		return user ? user.password === password ? user : null : null;
 	}
 
-	
+	async check(name: string) {
+		const user = await this.userService.findOneByName(name);
+		return ({
+			"success": true,
+			"user": user ? {
+				"name": user?.name
+			} : null
+		})
+	}
 }

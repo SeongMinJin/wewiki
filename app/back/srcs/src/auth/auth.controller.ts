@@ -42,4 +42,9 @@ export class AuthController {
 		});
 	}
 
+	@Get("check")
+	async check(@Req() req: Request) {
+		// @ts-ignore
+		return await this.authService.check(req.session.user || "");
+	}
 }
