@@ -1,4 +1,4 @@
-import { HttpCode, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wiki } from './entity/wiki.entity';
 import { Repository } from 'typeorm';
@@ -6,7 +6,6 @@ import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entity/user.entity';
 import { WikiSaveDto } from './dto/wiki.dto';
 import { WikiRef } from './entity/wiki.ref.entity';
-const bcrypt = require("bcrypt");
 
 @Injectable()
 export class WikiService {

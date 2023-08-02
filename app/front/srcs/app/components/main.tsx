@@ -15,15 +15,23 @@ export default function Main() {
 	const dispatch = useContext(StateDispatchContext);
 
 	const check = async function() {
-		const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/check`, {
-			method: "GET",
-			credentials: "include"
-		}).then(res => res.json());
+		try {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/check`, {
+				method: "GET",
+				credentials: "include",
+				headers: {
+					// "Host": "wewiki.back.com"
+				}
+			}).then(res => res.json());
+	
+			if (!res.success) {
+				return;
+			}
+			dispatch({type: "login"});
 
-		if (!res.success) {
-			return;
+		} catch (err) {
+			console.log(err);
 		}
-		dispatch({type: "login"});
 
 	}
 

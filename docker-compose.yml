@@ -5,8 +5,8 @@ services:
       - 80
     networks:
       - wewiki_network
-    volumes:
-      - front:/home
+    # volumes:
+    #   - front:/home
 
   back:
     build: ${PWD}/app/back
@@ -14,11 +14,15 @@ services:
       - 80
     networks:
       - wewiki_network
-    volumes:
-      - back:/home
+    # volumes:
+    #   - back:/home
 
   db:
-    image: "postgres"
+    build: ${PWD}/app/db
+    expose:
+      - 5432
+    networks:
+      - wewiki_network
 
 
   nginx:
@@ -33,17 +37,17 @@ services:
 networks:
   wewiki_network: {}
 
-volumes:
-  front:
-    driver_opts:
-      type: volume
-      o: bind
-      device: /home/wewiki/app/front/srcs
-  back:
-    driver_opts:
-      type: volume
-      o: bind
-      device: /home/wewiki/app/back/srcs
+# volumes:
+#   front:
+#     driver_opts:
+#       type: volume
+#       o: bind
+#       device: /home/wewiki/app/front/srcs
+#   back:
+#     driver_opts:
+#       type: volume
+#       o: bind
+#       device: /home/wewiki/app/back/srcs
 
       # device: /Users/seojin/goinfre/wewiki/app/front/
       # device: /Users/seojin/goinfre

@@ -39,7 +39,10 @@ export default function Graph({
 		try {
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/create`, {
 				method: "POST",
-				credentials: "include"
+				credentials: "include",
+				headers: {
+					// "Host": "wewiki.back.com"
+				}
 			}).then(res => res.json());
 			if (!res.success) {
 				ToastWraper("error", res.message, "/");
@@ -64,7 +67,8 @@ export default function Graph({
 				method: "DELETE",
 				credentials: "include",
 				headers: {
-					"Content-Type": "application/json"
+					"Content-Type": "application/json",
+					// "Host": "wewiki.back.com"
 				},
 				body: JSON.stringify({ id: id })
 			}).then(res => res);
@@ -93,7 +97,8 @@ export default function Graph({
 				method: "PATCH",
 				credentials: "include",
 				headers: {
-					"Content-Type": "application/json"
+					"Content-Type": "application/json",
+					// "Host": "wewiki.back.com"
 				},
 				body: JSON.stringify({
 					id: id,
@@ -135,7 +140,8 @@ export default function Graph({
 				method: "POST",
 				credentials: "include",
 				headers: {
-					"Content-Type": "application/json"
+					"Content-Type": "application/json",
+					// "Host": "wewiki.back.com"
 				},
 				body: JSON.stringify({
 					source: source,
@@ -188,7 +194,8 @@ export default function Graph({
 				method: "DELETE",
 				credentials: "include",
 				headers: {
-					"Content-Type": "application/json"
+					"Content-Type": "application/json",
+					// "Host": "wewiki.back.com"
 				},
 				body: JSON.stringify({
 					source: source,
@@ -222,7 +229,10 @@ export default function Graph({
 		async function init() {
 			try {
 				const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/find/all`, {
-					credentials: "include"
+					credentials: "include",
+					headers: {
+						// "Host": "wewiki.back.com"
+					}
 				}).then(res => res.json());
 
 				if (!res.success) {

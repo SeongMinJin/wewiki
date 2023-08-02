@@ -64,6 +64,9 @@ function Drawer() {
 				<li onClick={async () => {
 					const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signout`, {
 						credentials: "include",
+						headers: {
+							// "Host": "wewiki.back.com"
+						}
 					})
 					switch (res.status) {
 						case 200:
