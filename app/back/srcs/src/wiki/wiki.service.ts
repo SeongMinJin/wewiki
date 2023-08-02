@@ -1,16 +1,20 @@
-import { HttpCode, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpCode, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wiki } from './entity/wiki.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entity/user.entity';
 import { WikiSaveDto } from './dto/wiki.dto';
+import { WikiRef } from './entity/wiki.ref.entity';
+const bcrypt = require("bcrypt");
 
 @Injectable()
 export class WikiService {
 	constructor(
 		@InjectRepository(Wiki)
 		private wikiRepository: Repository<Wiki>,
+		@InjectRepository(WikiRef)
+		private wikiRefRepository: Repository<WikiRef>,
 		private userService: UserService,
 	) { }
 
@@ -110,10 +114,10 @@ export class WikiService {
 
 		if (wikies) {
 			for (const wiki of wikies) {
-				for (const target of wiki.refer) {
+				for (const refer of wiki.refer) {
 					links.push({
 						source: wiki.id,
-						target: target.id,
+						target: refer.target.id
 					})
 				}
 			}
@@ -124,14 +128,18 @@ export class WikiService {
 	async createOne(name: string) {
 		const user = await this.userService.findOneByName(name);
 		if (user) {
+
 			const newWiki = this.wikiRepository.create({
 				owner: user,
 				value: "제목",
+				hd: name + Date.now().toString()
 			});
+			
 			await this.wikiRepository.save(newWiki);
+
 			return {
 				"success": true,
-				"data": newWiki,
+				"data": newWiki
 			}
 		}
 	}
@@ -186,18 +194,29 @@ export class WikiService {
 			}, HttpStatus.NOT_FOUND);
 		}
 
-		if (sourceWiki.refer.find(wiki => wiki.id === target) || targetWiki.refer.find(wiki => wiki.id === source)) {
-			return ({
-				"success": false,
-				"message": "이미 연결된 위키입니다."
-			});
-		}
-
-		sourceWiki.refer.push(targetWiki);
-		await this.wikiRepository.save(sourceWiki);
-		return ({
-			"success": true
+		
+		const ref = await this.wikiRefRepository.findOne({
+			where: {
+				source: sourceWiki,
+				target: targetWiki
+			}
 		});
+
+		if (ref) {
+			return {
+				"success": true
+			}
+		};
+
+		const newRef = this.wikiRefRepository.create({
+			source: sourceWiki,
+			target: targetWiki
+		});
+
+		await this.wikiRefRepository.save(newRef);
+		return {
+			"success": true
+		}
 	}
 
 	async disconnect(name: string, source: number, target: number) {
@@ -206,19 +225,21 @@ export class WikiService {
 		const targetWiki = user?.wiki.find(wiki => wiki.id === target);
 
 		if (!sourceWiki || !targetWiki) {
-			throw new NotFoundException;
+			throw new NotFoundException();
 		}
 
-		const sourceIndex = sourceWiki.refer.findIndex(wiki => wiki.id === target);
-		const targetIndex = targetWiki.refer.findIndex(wiki => wiki.id === source);
+		const ref = await this.wikiRefRepository.findOne({
+			where: {
+				source: sourceWiki,
+				target: targetWiki
+			}
+		});
 
-		if (sourceIndex !== -1) {
-			sourceWiki.refer.splice(sourceIndex, 1);
-			await this.wikiRepository.save(sourceWiki);
-		} else if (targetIndex !== -1) {
-			targetWiki.refer.splice(targetIndex, 1);
-			await this.wikiRepository.save(targetWiki);
+		if (!ref) {
+			throw new NotFoundException();
 		}
+
+		await this.wikiRefRepository.delete(ref);
 	}
 
 }

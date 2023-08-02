@@ -18,7 +18,12 @@ export class UserService {
 			},
 			relations: {
 				wiki: {
-					refer: true,
+					refer: {
+						target: true
+					},
+					refered: {
+						source: true
+					}
 				}
 			}
 		})

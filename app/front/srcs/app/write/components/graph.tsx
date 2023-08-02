@@ -126,7 +126,7 @@ export default function Graph({
 
 	_connectWiki.current = async function (source: number, target: number) {
 
-		if (_relations.current.find(relation => (relation.source === source && relation.target === target) || (relation.source === target && relation.target === source))) {
+		if (_relations.current.find(relation => relation.source === source && relation.target === target)) {
 			return;
 		}
 
@@ -177,6 +177,11 @@ export default function Graph({
 			return;
 		}
 
+		const index = _relations.current.findIndex(relation => relation.source === source && relation.target === target);
+
+		if (index === -1) {
+			return;
+		}
 
 		try {
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/disconnect`, {
@@ -205,7 +210,7 @@ export default function Graph({
 				return;
 			}
 
-			_relations.current.splice(_relations.current.findIndex(relation => (relation.source === source && relation.target) || (relation.source === target && relation.target === source)), 1);
+			_relations.current.splice(index, 1);
 			_update.current?.(_wikies.current, _relations.current);
 
 		} catch {
@@ -293,7 +298,6 @@ export default function Graph({
 			}
 
 			_update.current = function (nodes, links) {
-
 				// Make a shallow copy to protect against mutation, while
 				// recycling old nodes to preserve position and velocity.
 				const old = new Map(node.data().map(d => [d.id, d]));
