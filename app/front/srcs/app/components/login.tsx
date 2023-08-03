@@ -88,7 +88,6 @@ const SignIn = async (id: string, password: string): Promise<boolean> => {
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signin`, {
 			headers: {
 				"Content-Type": "application/json",
-				"Host": "wewiki.back.com"
 			},
 			method: "post",
 			body: JSON.stringify({
@@ -128,7 +127,6 @@ const SignUp = async (id: string, password: string): Promise<boolean> => {
 		const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signup`, {
 			headers: {
 				"Content-Type": "application/json",
-				// "Host": "wewiki.back.com"
 			},
 			method: "post",
 			body: JSON.stringify({

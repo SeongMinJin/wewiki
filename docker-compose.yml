@@ -5,8 +5,8 @@ services:
       - 80
     networks:
       - wewiki_network
-    # volumes:
-    #   - front:/home
+    volumes:
+      - front:/home
 
   back:
     build: ${PWD}/app/back
@@ -14,8 +14,8 @@ services:
       - 80
     networks:
       - wewiki_network
-    # volumes:
-    #   - back:/home
+    volumes:
+      - back:/home
 
   db:
     build: ${PWD}/app/db
@@ -23,7 +23,8 @@ services:
       - 5432
     networks:
       - wewiki_network
-
+    volumes:
+      - db:/var/lib/pgsql/data
 
   nginx:
     build: ${PWD}/app/nginx
@@ -37,24 +38,25 @@ services:
 networks:
   wewiki_network: {}
 
-# volumes:
-#   front:
-#     driver_opts:
-#       type: volume
-#       o: bind
-#       device: /home/wewiki/app/front/srcs
-#   back:
-#     driver_opts:
-#       type: volume
-#       o: bind
-#       device: /home/wewiki/app/back/srcs
+
+volumes:
+  front:
+    driver_opts:
+      type: volume
+      o: bind
+      device: /home/wewiki/app/front/srcs
+  back:
+    driver_opts:
+      type: volume
+      o: bind
+      device: /home/wewiki/app/back/srcs
 
       # device: /Users/seojin/goinfre/wewiki/app/front/
       # device: /Users/seojin/goinfre
       # device: /Users/jinseongmin/Desktop/workshop/wewiki/app/front/srcs
-  # db:
-  #   driver_opts:
-  #     type: volume
-  #     o: bind
-  #     device: /home/wewiki/app/db/srcs
+  db:
+    driver_opts:
+      type: volume
+      o: bind
+      device: /home/wewiki/app/db/srcs
       # device: /Users/seojin/goinfre/wewiki/app/db/srcs

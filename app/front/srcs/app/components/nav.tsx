@@ -65,7 +65,6 @@ function Drawer() {
 					const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/signout`, {
 						credentials: "include",
 						headers: {
-							// "Host": "wewiki.back.com"
 						}
 					})
 					switch (res.status) {

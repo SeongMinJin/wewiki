@@ -41,7 +41,7 @@ export default function Graph({
 				method: "POST",
 				credentials: "include",
 				headers: {
-					// "Host": "wewiki.back.com"
+
 				}
 			}).then(res => res.json());
 			if (!res.success) {
@@ -68,7 +68,7 @@ export default function Graph({
 				credentials: "include",
 				headers: {
 					"Content-Type": "application/json",
-					// "Host": "wewiki.back.com"
+
 				},
 				body: JSON.stringify({ id: id })
 			}).then(res => res);
@@ -98,7 +98,7 @@ export default function Graph({
 				credentials: "include",
 				headers: {
 					"Content-Type": "application/json",
-					// "Host": "wewiki.back.com"
+
 				},
 				body: JSON.stringify({
 					id: id,
@@ -141,7 +141,7 @@ export default function Graph({
 				credentials: "include",
 				headers: {
 					"Content-Type": "application/json",
-					// "Host": "wewiki.back.com"
+
 				},
 				body: JSON.stringify({
 					source: source,
@@ -195,7 +195,7 @@ export default function Graph({
 				credentials: "include",
 				headers: {
 					"Content-Type": "application/json",
-					// "Host": "wewiki.back.com"
+
 				},
 				body: JSON.stringify({
 					source: source,
@@ -231,7 +231,6 @@ export default function Graph({
 				const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/find/all`, {
 					credentials: "include",
 					headers: {
-						// "Host": "wewiki.back.com"
 					}
 				}).then(res => res.json());
 

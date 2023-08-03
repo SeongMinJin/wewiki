@@ -18,10 +18,7 @@ export default function Main() {
 		try {
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/auth/check`, {
 				method: "GET",
-				credentials: "include",
-				headers: {
-					// "Host": "wewiki.back.com"
-				}
+				credentials: "include"
 			}).then(res => res.json());
 	
 			if (!res.success) {

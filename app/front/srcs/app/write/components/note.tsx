@@ -32,7 +32,6 @@ export default function Note({
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/find/content/${currentWiki.id}`, {
         credentials: "include",
         headers: {
-          // "Host": "wewiki.back.com"
         }
       }).then(res => res.json());
 
