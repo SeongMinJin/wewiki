@@ -1,4 +1,4 @@
 FROM node
-COPY ./srcs /home
+# COPY ./srcs /home
 WORKDIR /home
-CMD npm i && npm run start:dev
+CMD npm i && npm run start
