@@ -1,4 +1,5 @@
 FROM node
+COPY ./srcs /usr/src
 WORKDIR /usr/src
 RUN npm install -g n
 RUN n latest

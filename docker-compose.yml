@@ -6,8 +6,8 @@ services:
     networks:
       - wewiki_network
     tty: true
-    volumes:
-      - front:/usr/src
+    # volumes:
+    #   - front:/usr/src
 
   back:
     build: /home/wewiki/app/back
@@ -16,8 +16,8 @@ services:
     networks:
       - wewiki_network
     tty: true
-    volumes:
-      - back:/usr/src
+    # volumes:
+    #   - back:/usr/src
 
   db:
     build: /home/wewiki/app/db
@@ -42,16 +42,16 @@ networks:
 
 
 volumes:
-  front:
-    driver_opts:
-      type: volume
-      o: bind
-      device: /home/wewiki/app/front/srcs
-  back:
-    driver_opts:
-      type: volume
-      o: bind
-      device: /home/wewiki/app/back/srcs
+  # front:
+  #   driver_opts:
+  #     type: volume
+  #     o: bind
+  #     device: /home/wewiki/app/front/srcs/
+  # back:
+  #   driver_opts:
+  #     type: volume
+  #     o: bind
+  #     device: /home/wewiki/app/back/srcs/
 
       # device: /Users/seojin/goinfre/wewiki/app/front/
       # device: /Users/seojin/goinfre
@@ -60,5 +60,5 @@ volumes:
     driver_opts:
       type: volume
       o: bind
-      device: /home/wewiki/app/db/srcs
+      device: /home/wewiki/app/db/srcs/
       # device: /Users/seojin/goinfre/wewiki/app/db/srcs
