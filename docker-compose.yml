@@ -1,6 +1,6 @@
 services:
   front:
-    build: ${PWD}/app/front
+    build: /home/wewiki/app/front
     expose:
       - 80
     networks:
@@ -9,7 +9,7 @@ services:
       - front:/home
 
   back:
-    build: ${PWD}/app/back
+    build: /home/wewiki/app/back
     expose:
       - 80
     networks:
@@ -18,7 +18,7 @@ services:
       - back:/home
 
   db:
-    build: ${PWD}/app/db
+    build: /home/wewiki/app/db
     expose:
       - 5432
     networks:
@@ -27,7 +27,7 @@ services:
       - db:/var/lib/pgsql/data
 
   nginx:
-    build: ${PWD}/app/nginx
+    build: /home/wewiki/app/nginx
     ports:
       - 80:80
     networks:
