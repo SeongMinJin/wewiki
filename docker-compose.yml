@@ -7,7 +7,7 @@ services:
       - wewiki_network
     tty: true
     volumes:
-      - front:/home
+      - front:/usr/src
 
   back:
     build: /home/wewiki/app/back
@@ -17,7 +17,7 @@ services:
       - wewiki_network
     tty: true
     volumes:
-      - back:/home
+      - back:/usr/src
 
   db:
     build: /home/wewiki/app/db
