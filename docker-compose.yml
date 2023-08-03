@@ -24,7 +24,7 @@ services:
     networks:
       - wewiki_network
     volumes:
-      - db:/var/lib/pgsql/data
+      - db:/var/lib/postgresql/data
 
   nginx:
     build: /home/wewiki/app/nginx
