@@ -1,4 +1,4 @@
-FROM debian
+FROM node
 # WORKDIR /home
 # RUN npm install -g n
 # RUN n latest
