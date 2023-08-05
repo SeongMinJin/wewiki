@@ -8,6 +8,7 @@ import { ToastWraper } from "@/app/components/main";
 
 
 export default function Graph({
+	currentWiki,
 	setCurrentWiki,
 	_createWiki,
 	_saveWiki,
@@ -18,6 +19,7 @@ export default function Graph({
 	_disconnectQueue,
 	_wikies
 }: {
+	currentWiki: Wiki | null,
 	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
 	_createWiki: MutableRefObject<(() => Promise<void>) | undefined>,
 	_saveWiki: MutableRefObject<((id: number, body: { value?: string, content?: string }) => Promise<void>) | undefined>,
@@ -112,14 +114,14 @@ export default function Graph({
 
 			if (body.value) {
 				const wiki = _wikies.current.find(wiki => wiki.id === id);
-
+				
 				if (wiki) {
 					wiki.value = body.value;
 					_update.current(_wikies.current, _relations.current);
 					d3.select(`#id${id}`).select("text").text(body.value);
 				}
 			}
-
+			setCurrentWiki({...currentWiki, updatedAt: res.data});
 			_connectQueue.current = [];
 			_disconnectQueue.current = [];
 			ToastWraper("success", "저장되었습니다.");

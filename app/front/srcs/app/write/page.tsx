@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { ToastContainer } from "react-toastify"
 import { useRouter } from "next/navigation"
 import Graph from "./components/graph"
@@ -102,7 +102,7 @@ export default function Write() {
 						</div>
 				}
 				<div className="relative hidden w-full h-screen tablet:block">
-					<Graph _connectQueue={_connectQueue} _disconnectQueue={_disconnectQueue}  _createWiki={_createWiki} _saveWiki={_saveWiki} _deleteWiki={_deleteWiki} _disconnectWiki={_disconnectWiki} setCurrentWiki={setCurrentWiki} _connectWiki={_connectWiki} _wikies={_wikies}/>
+					<Graph currentWiki={currentWiki} _connectQueue={_connectQueue} _disconnectQueue={_disconnectQueue}  _createWiki={_createWiki} _saveWiki={_saveWiki} _deleteWiki={_deleteWiki} _disconnectWiki={_disconnectWiki} setCurrentWiki={setCurrentWiki} _connectWiki={_connectWiki} _wikies={_wikies}/>
 				</div>
 			</div>
 			<ToastContainer

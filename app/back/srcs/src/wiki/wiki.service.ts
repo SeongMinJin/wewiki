@@ -26,7 +26,7 @@ export class WikiService {
 	async findAll(name: string) {
 		const user = await this.userService.findOneByName(name)
 		return {
-			"success": true,
+			success: true,
 			"data": {
 				"wikies": user?.wiki,
 				"relations": await this.makeRelations(name)
@@ -48,13 +48,13 @@ export class WikiService {
 
 		if (!wiki) {
 			throw new HttpException({
-				"success": false,
-				"message": "존재하지 않는 위키입니다."
+				success: false,
+				message: "존재하지 않는 위키입니다."
 			}, HttpStatus.NOT_FOUND)
 		}
 
 		return {
-			"success": true,
+			success: true,
 			"data": wiki,
 		}
 	}
@@ -81,13 +81,13 @@ export class WikiService {
 
 		if (!wiki) {
 			throw new HttpException({
-				"success": false,
-				"message": "존재하지 않는 위키입니다."
+				success: false,
+				message: "존재하지 않는 위키입니다."
 			}, HttpStatus.NOT_FOUND);
 		}
 
 		return {
-			"success": true,
+			success: true,
 			"data": wiki.content
 		};
 
@@ -140,7 +140,7 @@ export class WikiService {
 			await this.wikiRepository.save(newWiki);
 
 			return {
-				"success": true,
+				success: true,
 				"data": {
 					id: newWiki.id,
 					value: newWiki.value,
@@ -158,8 +158,8 @@ export class WikiService {
 		const wiki = user?.wiki.find(wiki => wiki.id === body.id);
 		if (!wiki) {
 			throw new HttpException({
-				"success": false,
-				"message": "존재하지 않는 위키입니다."
+				success: false,
+				message: "존재하지 않는 위키입니다."
 			}, HttpStatus.NOT_FOUND)
 		}
 
@@ -168,6 +168,9 @@ export class WikiService {
 
 		if (body.content)
 			wiki.content = body.content;
+		
+		const current = new Date(Date.now());
+		wiki.updatedAt = current;
 
 		await this.wikiRepository.save(wiki);
 
@@ -181,7 +184,8 @@ export class WikiService {
 
 
 		return {
-			success: true
+			success: true,
+			data: current
 		}
 	}
 
@@ -191,8 +195,8 @@ export class WikiService {
 
 		if (!wiki) {
 			throw new HttpException({
-				"success": false,
-				"message": "존재하지 않는 위키입니다."
+				success: false,
+				message: "존재하지 않는 위키입니다."
 			}, HttpStatus.NOT_FOUND)
 		}
 		await this.wikiRepository.remove(wiki);
@@ -206,8 +210,8 @@ export class WikiService {
 
 		if (!sourceWiki || !targetWiki) {
 			throw new HttpException({
-				"success": false,
-				"message": "존재하지 않는 위키입니다."
+				success: false,
+				message: "존재하지 않는 위키입니다."
 			}, HttpStatus.NOT_FOUND);
 		}
 
