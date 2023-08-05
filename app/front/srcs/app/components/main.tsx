@@ -24,6 +24,11 @@ export default function Main() {
 			if (!res.success) {
 				return;
 			}
+
+			if (!res.data.user) {
+				return;
+			}
+
 			dispatch({type: "login"});
 
 		} catch (err) {
