@@ -10,7 +10,6 @@ import { ToastWraper } from "@/app/components/main";
 import "quill-mention/dist/quill.mention.css"
 import Quill from "quill";
 
-
 export default function Note({
   currentWiki,
   setCurrentWiki,
@@ -88,10 +87,8 @@ export default function Note({
             }
           }
         },
-        imageResize: {
-          modules: [ 'Resize', 'DisplaySize', 'Toolbar' ]
-        },
-      },
+        imageResize: {},
+      }
     });
 
     editor.current?.on("text-change", () => {

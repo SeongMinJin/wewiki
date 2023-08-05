@@ -13,6 +13,7 @@ const Note = dynamic(async () => {
 	// @ts-ignore
 	const { default: imageResize } = await import("quill-image-resize");
 	Quill.register("modules/imageResize", imageResize);
+
 	return await import('./components/note');
 }, {
 	ssr: false,
