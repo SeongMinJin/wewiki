@@ -7,8 +7,9 @@ import 'react-quill/dist/quill.snow.css';
 import "quill-mention";
 import { Wiki } from "../page";
 import { ToastWraper } from "@/app/components/main";
-import Quill from "quill";
 import "quill-mention/dist/quill.mention.css"
+import Quill from "quill";
+
 
 export default function Note({
   currentWiki,
@@ -23,8 +24,8 @@ export default function Note({
   setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
   setDisableDeleteButton: Dispatch<SetStateAction<boolean>>,
   _saveWiki: MutableRefObject<((id: number, body: { value?: string, content?: string }) => Promise<void>) | undefined>,
-	_connectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
-	_disconnectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
+  _connectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
+  _disconnectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
   _wikies: MutableRefObject<Wiki[]>
 }) {
   const timerId = useRef<Map<number, NodeJS.Timeout>>(new Map<number, NOdeJS.Timeout>());
@@ -50,11 +51,6 @@ export default function Note({
   }
 
   const editor = useRef<Quill>();
-
-  useEffect(() => {
-    // window.addEventListener('mention-clicked', (event) => setCurrentWiki({ id: event.value.id, value: event.value.value }), false);
-  }, []);
-
   useEffect(() => {
     editor.current = new Quill("#editor", {
       theme: "snow",
@@ -91,7 +87,10 @@ export default function Note({
               renderList(matches, searchTerm);
             }
           }
-        }
+        },
+        imageResize: {
+          modules: [ 'Resize', 'DisplaySize', 'Toolbar' ]
+        },
       },
     });
 
@@ -120,7 +119,7 @@ export default function Note({
             _connectWiki.current?.(currentWiki.id, parseInt(elem.addedNodes[0].getAttribute("data-id")));
           }
           continue;
-        } 
+        }
 
         if (elem.removedNodes.length) {
           if (elem.removedNodes[0] instanceof HTMLSpanElement) {

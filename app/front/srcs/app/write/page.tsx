@@ -7,7 +7,14 @@ import Graph from "./components/graph"
 import 'react-toastify/dist/ReactToastify.css';
 import dynamic from "next/dynamic"
 import { ToastWraper } from "../components/main"
-const Note = dynamic(() => import('./components/note'), {
+const Note = dynamic(async () => {
+	const { default: Quill } = await import('quill');
+
+	// @ts-ignore
+	const { default: imageResize } = await import("quill-image-resize");
+	Quill.register("modules/imageResize", imageResize);
+	return await import('./components/note');
+}, {
 	ssr: false,
 })
 

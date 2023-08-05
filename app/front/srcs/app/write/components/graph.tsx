@@ -151,6 +151,13 @@ export default function Graph({
 
 	_connectWiki.current = function (source: number, target: number) {
 
+		if (isNaN(source)) {
+			return;
+		}
+		
+		if (isNaN(target)) {
+			return;
+		}
 		/**
 		 * 이미 연결되어 있는지 확인
 		 */
@@ -222,7 +229,13 @@ export default function Graph({
 	}
 
 	_disconnectWiki.current = function (source: number, target: number) {
-
+		if (isNaN(source)) {
+			return;
+		}
+		
+		if (isNaN(target)) {
+			return;
+		}
 		/**
 		 * disconnect 이벤트가 제일 마지막 mention 요소에만 적용될 수 있게 확인
 		 */
