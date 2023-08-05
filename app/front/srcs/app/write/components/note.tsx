@@ -142,7 +142,7 @@ export default function Note({
       markdown.destroy();
       observer.disconnect();
     });
-  }, [currentWiki])
+  }, [currentWiki.id])
 
 
   return (
