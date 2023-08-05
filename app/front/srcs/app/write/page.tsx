@@ -14,6 +14,8 @@ const Note = dynamic(() => import('./components/note'), {
 export interface Wiki {
 	id: number;
 	value: string;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 export interface Relation {
@@ -62,6 +64,7 @@ export default function Write() {
 							}} className="w-full font-noto font-semibold p-4 text-[230%] focus:outline-none" type="text" placeholder={`제목을 써주세요.`} />
 							<div className="w-full p-4">
 								<div className="mb-4 bg-black bg-opacity-70 w-16 h-[6px]"></div>
+								<p className="italic text-s opacity-40" ><span className="font-bold">Updated </span>{currentWiki.updatedAt ? `${new Date(currentWiki.updatedAt).getFullYear()}년 ${new Date(currentWiki.updatedAt).getMonth() + 1}월 ${new Date(currentWiki.updatedAt).getDate()}일 ${new Date(currentWiki.updatedAt).getHours()}시 ${new Date(currentWiki.updatedAt).getMinutes()}분` : ""}</p>
 							</div>
 
 							{/* <Note currentWiki={currentWiki} _saveWiki={_saveWiki} /> */}

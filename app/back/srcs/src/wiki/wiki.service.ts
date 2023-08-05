@@ -128,17 +128,26 @@ export class WikiService {
 		const user = await this.userService.findOneByName(name);
 		if (user) {
 
+			const currentDate = new Date(Date.now());
 			const newWiki = this.wikiRepository.create({
 				owner: user,
 				value: "제목",
-				hd: name + Date.now().toString()
+				hd: name + Date.now().toString(),
+				createdAt: currentDate,
+				updatedAt: currentDate
 			});
 			
 			await this.wikiRepository.save(newWiki);
 
 			return {
 				"success": true,
-				"data": newWiki
+				"data": {
+					id: newWiki.id,
+					value: newWiki.value,
+					hd: newWiki.hd,
+					createdAt: newWiki.createdAt,
+					updatedAt: newWiki.updatedAt
+				}
 			}
 		}
 	}

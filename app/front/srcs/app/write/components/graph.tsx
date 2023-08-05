@@ -49,13 +49,9 @@ export default function Graph({
 				ToastWraper("error", res.message, "/");
 				return;
 			}
-			const newWiki = {
-				id: res.data.id,
-				value: res.data.value
-			};
-			_wikies.current.push(newWiki);
+			_wikies.current.push(res.data);
 			_update.current(_wikies.current, _relations.current);
-			setCurrentWiki(newWiki);
+			setCurrentWiki(res.data);
 			ToastWraper("success", "생성되었습니다.")
 		} catch {
 			ToastWraper("error", "서버가 아파요 :(", "/");
@@ -87,7 +83,6 @@ export default function Graph({
 			setCurrentWiki(null);
 			ToastWraper("success", "삭제되었습니다.");
 		} catch (err) {
-			console.log(err);
 			ToastWraper("error", "서버가 아파요 :(")
 		}
 	}
@@ -398,7 +393,10 @@ export default function Graph({
 					.on("click", (e, d) => {
 						const newWiki = {
 							id: d.id,
-							value: d.value
+							value: d.value,
+							hd: d.hd,
+							createdAt: d.createdAt,
+							updatedAt: d.updatedAt
 						};
 						setCurrentWiki(newWiki);
 					})
