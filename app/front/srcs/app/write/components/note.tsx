@@ -2,7 +2,7 @@
 "use client"
 
 import QuillMarkdown from "quilljs-markdown";
-import { MutableRefObject, useEffect, useRef } from "react"
+import { MutableRefObject, SetStateAction, useEffect, useRef } from "react"
 import 'react-quill/dist/quill.snow.css';
 import "quill-mention";
 import { Wiki } from "../page";
@@ -13,6 +13,7 @@ import "quill-mention/dist/quill.mention.css"
 export default function Note({
   currentWiki,
   setCurrentWiki,
+  setDisableDeleteButton,
   _saveWiki,
   _connectWiki,
   _disconnectWiki,
@@ -20,6 +21,7 @@ export default function Note({
 }: {
   currentWiki: Wiki,
   setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
+  setDisableDeleteButton: Dispatch<SetStateAction<boolean>>,
   _saveWiki: MutableRefObject<((id: number, body: { value?: string, content?: string }) => Promise<void>) | undefined>,
 	_connectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
 	_disconnectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
@@ -95,7 +97,7 @@ export default function Note({
 
     editor.current?.on("text-change", () => {
       const value = editor.current?.root.innerHTML;
-
+      setDisableDeleteButton(true);
       if (timerId.current?.get(currentWiki.id)) {
         clearTimeout(timerId.current?.get(currentWiki.id));
       }

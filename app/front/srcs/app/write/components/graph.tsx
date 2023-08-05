@@ -10,6 +10,7 @@ import { ToastWraper } from "@/app/components/main";
 export default function Graph({
 	currentWiki,
 	setCurrentWiki,
+	setDisableDeleteButton,
 	_createWiki,
 	_saveWiki,
 	_deleteWiki,
@@ -21,6 +22,7 @@ export default function Graph({
 }: {
 	currentWiki: Wiki | null,
 	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
+	setDisableDeleteButton: Dispatch<SetStateAction<boolean>>,
 	_createWiki: MutableRefObject<(() => Promise<void>) | undefined>,
 	_saveWiki: MutableRefObject<((id: number, body: { value?: string, content?: string }) => Promise<void>) | undefined>,
 	_deleteWiki: MutableRefObject<((id: number) => Promise<void>) | undefined>,
@@ -61,6 +63,11 @@ export default function Graph({
 	}
 
 	_deleteWiki.current = async function (id: number) {
+		if (_relations.current.find(relation => relation.source === id || relation.target === id)) {
+			ToastWraper("warn", "위키 관계를 전부 삭제해주세요.");
+			return;
+		}
+
 		try {
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/remove`, {
 				method: "DELETE",
@@ -105,10 +112,20 @@ export default function Graph({
 					connectQueue: _connectQueue.current,
 					disconnectQueue: _disconnectQueue.current
 				})
-			}).then(res => res.json());
+			}).then(res => {
+
+				if (res.status === 404) {
+					ToastWraper("error", "존재하지 않는 위키입니다.");
+				}
+
+				if (res.status === 401) {
+					ToastWraper("error", "로그인 해주세요.", "/");
+				}
+
+				return res.json()
+			});
 
 			if (!res.success) {
-				ToastWraper("error", res.message, "/");
 				return;
 			}
 
@@ -122,6 +139,7 @@ export default function Graph({
 				}
 			}
 			setCurrentWiki({...currentWiki, updatedAt: res.data});
+			setDisableDeleteButton(false);
 			_connectQueue.current = [];
 			_disconnectQueue.current = [];
 			ToastWraper("success", "저장되었습니다.");

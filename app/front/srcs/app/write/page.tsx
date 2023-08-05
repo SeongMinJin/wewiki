@@ -25,6 +25,7 @@ export interface Relation {
 
 export default function Write() {
 	const [currentWiki, setCurrentWiki] = useState<Wiki | null>(null);
+	const [disableDeleteButton, setDisableDeleteButton] = useState<boolean>(false);
 	const _createWiki = useRef<() => Promise<void>>();
 	const _saveWiki = useRef<(id: number, body: { value?: string, content?: any }) => Promise<void>>();
 	const _deleteWiki = useRef<(id: number) => Promise<void>>();
@@ -34,7 +35,6 @@ export default function Write() {
 	const _connectQueue = useRef<Relation[]>([]);
 	const _disconnectQueue = useRef<Relation[]>([]);
 	const timerId = useRef<Map<number, NodeJS.Timeout>>(new Map<number, NodeJS.Timeout>());
-
 	const router = useRouter();
 
 	return (
@@ -68,7 +68,7 @@ export default function Write() {
 							</div>
 
 							{/* <Note currentWiki={currentWiki} _saveWiki={_saveWiki} /> */}
-							<Note currentWiki={currentWiki} setCurrentWiki={setCurrentWiki} _saveWiki={_saveWiki} _connectWiki={_connectWiki} _disconnectWiki={_disconnectWiki} _wikies={_wikies}/>
+							<Note setDisableDeleteButton={setDisableDeleteButton} currentWiki={currentWiki} setCurrentWiki={setCurrentWiki} _saveWiki={_saveWiki} _connectWiki={_connectWiki} _disconnectWiki={_disconnectWiki} _wikies={_wikies}/>
 							
 
 							
@@ -77,7 +77,7 @@ export default function Write() {
 									⬅ 나가기
 								</button>
 								<div className="flex gap-x-4">
-									<button className="px-4 py-2 text-white bg-red-500 rounded-md whitespace-nowrap hover:bg-opacity-80" onClick={() => _deleteWiki.current?.(currentWiki.id)}>
+									<button disabled={disableDeleteButton} className="px-4 py-2 text-white bg-red-500 rounded-md disabled:bg-gray-400 whitespace-nowrap hover:bg-opacity-80" onClick={() => _deleteWiki.current?.(currentWiki.id)}>
 										삭제하기
 									</button>
 								</div>
@@ -102,7 +102,7 @@ export default function Write() {
 						</div>
 				}
 				<div className="relative hidden w-full h-screen tablet:block">
-					<Graph currentWiki={currentWiki} _connectQueue={_connectQueue} _disconnectQueue={_disconnectQueue}  _createWiki={_createWiki} _saveWiki={_saveWiki} _deleteWiki={_deleteWiki} _disconnectWiki={_disconnectWiki} setCurrentWiki={setCurrentWiki} _connectWiki={_connectWiki} _wikies={_wikies}/>
+					<Graph setDisableDeleteButton={setDisableDeleteButton} currentWiki={currentWiki} _connectQueue={_connectQueue} _disconnectQueue={_disconnectQueue}  _createWiki={_createWiki} _saveWiki={_saveWiki} _deleteWiki={_deleteWiki} _disconnectWiki={_disconnectWiki} setCurrentWiki={setCurrentWiki} _connectWiki={_connectWiki} _wikies={_wikies}/>
 				</div>
 			</div>
 			<ToastContainer
