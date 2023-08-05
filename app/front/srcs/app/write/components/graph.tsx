@@ -14,14 +14,18 @@ export default function Graph({
 	_deleteWiki,
 	_connectWiki,
 	_disconnectWiki,
+	_connectQueue,
+	_disconnectQueue,
 	_wikies
 }: {
 	setCurrentWiki: Dispatch<SetStateAction<Wiki | null>>,
-	_createWiki: MutableRefObject<(() => Promise<void>) | undefined>
-	_saveWiki: MutableRefObject<((id: number, body: { value?: string, content?: string }) => Promise<void>) | undefined>
-	_deleteWiki: MutableRefObject<((id: number) => Promise<void>) | undefined>
-	_connectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>
-	_disconnectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>
+	_createWiki: MutableRefObject<(() => Promise<void>) | undefined>,
+	_saveWiki: MutableRefObject<((id: number, body: { value?: string, content?: string }) => Promise<void>) | undefined>,
+	_deleteWiki: MutableRefObject<((id: number) => Promise<void>) | undefined>,
+	_connectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
+	_disconnectWiki: MutableRefObject<((source: number, target: number) => Promise<void>) | undefined>,
+	_connectQueue: MutableRefObject<Relation[]>,
+	_disconnectQueue: MutableRefObject<Relation[]>,
 	_wikies: MutableRefObject<Wiki[]>
 }
 ) {
@@ -40,9 +44,6 @@ export default function Graph({
 			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/create`, {
 				method: "POST",
 				credentials: "include",
-				headers: {
-
-				}
 			}).then(res => res.json());
 			if (!res.success) {
 				ToastWraper("error", res.message, "/");
@@ -103,7 +104,9 @@ export default function Graph({
 				body: JSON.stringify({
 					id: id,
 					value: body.value || null,
-					content: body.content || null
+					content: body.content || null,
+					connectQueue: _connectQueue.current,
+					disconnectQueue: _disconnectQueue.current
 				})
 			}).then(res => res.json());
 
@@ -122,6 +125,8 @@ export default function Graph({
 				}
 			}
 
+			_connectQueue.current = [];
+			_disconnectQueue.current = [];
 			ToastWraper("success", "저장되었습니다.");
 
 		} catch {
@@ -129,101 +134,149 @@ export default function Graph({
 		}
 	}
 
-	_connectWiki.current = async function (source: number, target: number) {
+	_connectWiki.current = function (source: number, target: number) {
 
+		/**
+		 * 이미 연결되어 있는지 확인
+		 */
 		if (_relations.current.find(relation => relation.source === source && relation.target === target)) {
 			return;
 		}
 
-		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/connect`, {
-				method: "POST",
-				credentials: "include",
-				headers: {
-					"Content-Type": "application/json",
-
-				},
-				body: JSON.stringify({
-					source: source,
-					target: target
-				})
-			}).then(res => {
-				if (res.status === 404) {
-					return res.json();
-				}
-
-				if (res.status === 401) {
-					ToastWraper("error", "로그인 해주세요.", "/");
-					return res.json();
-				}
-
-				if (res.status === 500) {
-					ToastWraper("error", "서버가 아파요 :(", "/");
-				}
-
-				return res.json();
+		/**
+		 * disconnect Queue에 있는지 확인
+		 * disconnect Queue에 있으면 여기서 지워준고
+		 * disconnect Queue에 없으면 connect Queue에 넣어주고
+		 */
+		const index = _disconnectQueue.current.findIndex(relation => relation.source === source && relation.target === target)
+		if (index !== -1) {  
+			_disconnectQueue.current.splice(index, 1);
+		} else {
+			_connectQueue.current.push({
+				source: source,
+				target: target
 			});
-
-			if (res.success) {
-				_relations.current.push({
-					source: source,
-					target: target
-				});
-				_update.current?.(_wikies.current, _relations.current);
-				return;
-			}
-
-		} catch {
-			ToastWraper("error", "서버가 아파요 :(");
 		}
+		_relations.current.push({
+			source: source,
+			target: target
+		});
+		_update.current(_wikies.current, _relations.current);
+
+		// try {
+		// 	const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/connect`, {
+		// 		method: "POST",
+		// 		credentials: "include",
+		// 		headers: {
+		// 			"Content-Type": "application/json",
+
+		// 		},
+		// 		body: JSON.stringify({
+		// 			source: source,
+		// 			target: target
+		// 		})
+		// 	}).then(res => {
+		// 		if (res.status === 404) {
+		// 			return res.json();
+		// 		}
+
+		// 		if (res.status === 401) {
+		// 			ToastWraper("error", "로그인 해주세요.", "/");
+		// 			return res.json();
+		// 		}
+
+		// 		if (res.status === 500) {
+		// 			ToastWraper("error", "서버가 아파요 :(", "/");
+		// 		}
+
+		// 		return res.json();
+		// 	});
+
+		// 	if (res.success) {
+		// 		_relations.current.push({
+		// 			source: source,
+		// 			target: target
+		// 		});
+		// 		_update.current?.(_wikies.current, _relations.current);
+		// 		return;
+		// 	}
+
+		// } catch {
+		// 	ToastWraper("error", "서버가 아파요 :(");
+		// }
 	}
 
-	_disconnectWiki.current = async function (source: number, target: number) {
+	_disconnectWiki.current = function (source: number, target: number) {
+
+		/**
+		 * disconnect 이벤트가 제일 마지막 mention 요소에만 적용될 수 있게 확인
+		 */
 		if (document.querySelectorAll(`[data-id="${target}"]`).length) {
 			return;
 		}
 
+		/**
+		 * 이미 연결이 끊겨있는지 확인
+		 * 연결되어있는 상태라면 끊어줌
+		 */
 		const index = _relations.current.findIndex(relation => relation.source === source && relation.target === target);
 
 		if (index === -1) {
 			return;
 		}
 
-		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/disconnect`, {
-				method: "DELETE",
-				credentials: "include",
-				headers: {
-					"Content-Type": "application/json",
-
-				},
-				body: JSON.stringify({
-					source: source,
-					target: target
-				})
-			}).then(res => res);
-
-			if (res.status === 404) {
-				return;
-			}
-
-			if (res.status === 401) {
-				ToastWraper("error", "로그인 해주세요.", "/");
-				return;
-			}
-
-			if (res.status === 500) {
-				ToastWraper("error", "서버가 아파요 :(", "/");
-				return;
-			}
-
-			_relations.current.splice(index, 1);
-			_update.current?.(_wikies.current, _relations.current);
-
-		} catch {
-			ToastWraper("error", "서버가 아파요 :(");
+		/**
+		 * connect Queue에 등록되어있으면 connect Queue를 삭제해주고
+		 * 아니면 disconnect Queue에 새로 등록
+		 */
+		const connectQueueIndex = _connectQueue.current.findIndex(relation => relation.source === source && relation.target === target);
+		if (connectQueueIndex !== -1) {
+			_connectQueue.current.splice(connectQueueIndex, 1);
+		} else {
+			_disconnectQueue.current.push({
+				source: source,
+				target: target
+			});
 		}
+
+		_relations.current.splice(index, 1);
+		_update.current(_wikies.current, _relations.current);
+		// try {
+		// 	const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}:${process.env.NEXT_PUBLIC_API_PORT}/wiki/disconnect`, {
+		// 		method: "DELETE",
+		// 		credentials: "include",
+		// 		headers: {
+		// 			"Content-Type": "application/json",
+
+		// 		},
+		// 		body: JSON.stringify({
+		// 			source: source,
+		// 			target: target
+		// 		})
+		// 	}).then(res => res);
+
+		// 	if (res.status === 404) {
+		// 		return;
+		// 	}
+
+		// 	if (res.status === 401) {
+		// 		ToastWraper("error", "로그인 해주세요.", "/");
+		// 		return;
+		// 	}
+
+		// 	if (res.status === 500) {
+		// 		ToastWraper("error", "서버가 아파요 :(", "/");
+		// 		return;
+		// 	}
+
+		// 	_relations.current.splice(index, 1);
+		// 	_update.current?.(_wikies.current, _relations.current);
+
+		// } catch {
+		// 	ToastWraper("error", "서버가 아파요 :(");
+		// }
 	}
+
 
 	useEffect(() => {
 		async function init() {
@@ -240,6 +293,7 @@ export default function Graph({
 				}
 				_wikies.current = res.data.wikies;
 				_relations.current = res.data.relations;
+
 			} catch {
 				ToastWraper("error", "서버가 아파요 :(", "/")
 			}

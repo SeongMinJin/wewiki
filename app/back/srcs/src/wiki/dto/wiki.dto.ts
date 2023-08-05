@@ -1,5 +1,10 @@
 import { IsInt, IsNotEmpty, Max, Min } from "class-validator";
 
+interface Queue {
+	source: number;
+	target: number;
+};
+
 export class WikiFindOneDto {
 	@IsNotEmpty()
 	@IsInt()
@@ -16,8 +21,9 @@ export class WikiSaveDto {
 	id: number;
 
 	value: string | null;
-
 	content: string | null;
+	connectQueue: Queue[];
+	disconnectQueue: Queue[];
 }
 
 export class WikiDeleteDto {

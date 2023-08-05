@@ -29,6 +29,8 @@ export default function Write() {
 	const _connectWiki = useRef<(target: number, source: number) => Promise<void>>();
 	const _disconnectWiki = useRef<(target: number, source: number) => Promise<void>>();
 	const _wikies = useRef<Wiki[]>([]);
+	const _connectQueue = useRef<Relation[]>([]);
+	const _disconnectQueue = useRef<Relation[]>([]);
 	const timerId = useRef<Map<number, NodeJS.Timeout>>(new Map<number, NodeJS.Timeout>());
 
 	const router = useRouter();
@@ -97,7 +99,7 @@ export default function Write() {
 						</div>
 				}
 				<div className="relative hidden w-full h-screen tablet:block">
-					<Graph _createWiki={_createWiki} _saveWiki={_saveWiki} _deleteWiki={_deleteWiki} _disconnectWiki={_disconnectWiki} setCurrentWiki={setCurrentWiki} _connectWiki={_connectWiki} _wikies={_wikies}/>
+					<Graph _connectQueue={_connectQueue} _disconnectQueue={_disconnectQueue}  _createWiki={_createWiki} _saveWiki={_saveWiki} _deleteWiki={_deleteWiki} _disconnectWiki={_disconnectWiki} setCurrentWiki={setCurrentWiki} _connectWiki={_connectWiki} _wikies={_wikies}/>
 				</div>
 			</div>
 			<ToastContainer

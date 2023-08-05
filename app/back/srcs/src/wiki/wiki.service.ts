@@ -162,6 +162,15 @@ export class WikiService {
 
 		await this.wikiRepository.save(wiki);
 
+		for (const connect of body.connectQueue) {
+			await this.connect(name, connect.source, connect.target);
+		}
+
+		for (const disconnect of body.disconnectQueue) {
+			await this.disconnect(name, disconnect.source, disconnect.target);
+		}
+
+
 		return {
 			success: true
 		}
@@ -193,7 +202,7 @@ export class WikiService {
 			}, HttpStatus.NOT_FOUND);
 		}
 
-		
+
 		const ref = await this.wikiRefRepository.findOne({
 			where: {
 				source: sourceWiki,
@@ -202,10 +211,8 @@ export class WikiService {
 		});
 
 		if (ref) {
-			return {
-				"success": true
-			}
-		};
+			return;
+		}
 
 		const newRef = this.wikiRefRepository.create({
 			source: sourceWiki,
@@ -213,9 +220,6 @@ export class WikiService {
 		});
 
 		await this.wikiRefRepository.save(newRef);
-		return {
-			"success": true
-		}
 	}
 
 	async disconnect(name: string, source: number, target: number) {
