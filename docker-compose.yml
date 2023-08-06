@@ -14,8 +14,9 @@ services:
       - 80
     networks:
       - wewiki_network
-    # volumes:
-    #   - back:/usr/src
+    volumes:
+      - ./app/certbot/conf:/etc/letsencrypt
+      - ./app/certbot/www:/var/www/certbot
 
   db:
     build: /home/wewiki/app/db
@@ -33,8 +34,15 @@ services:
       - 443:443
     networks:
       - wewiki_network
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     # volumes:
     #   - front:/usr/share/nginx/html
+  certbot:
+    image: certbot
+    volumes:
+      - ./app/certbot/conf:/etc/letsencrypt
+      - ./app/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 networks:
   wewiki_network: {}
