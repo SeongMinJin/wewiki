@@ -30,6 +30,7 @@ services:
     build: /home/wewiki/app/nginx
     ports:
       - 80:80
+      - 443:443
     networks:
       - wewiki_network
     # volumes:
