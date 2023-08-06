@@ -26,7 +26,7 @@ export class WikiService {
 	async findAll(name: string) {
 		const user = await this.userService.findOneByName(name)
 		return {
-			"success": true,
+			success: true,
 			"data": {
 				"wikies": user?.wiki,
 				"relations": await this.makeRelations(name)
@@ -48,13 +48,13 @@ export class WikiService {
 
 		if (!wiki) {
 			throw new HttpException({
-				"success": false,
-				"message": "존재하지 않는 위키입니다."
+				success: false,
+				message: "존재하지 않는 위키입니다."
 			}, HttpStatus.NOT_FOUND)
 		}
 
 		return {
-			"success": true,
+			success: true,
 			"data": wiki,
 		}
 	}
@@ -81,13 +81,13 @@ export class WikiService {
 
 		if (!wiki) {
 			throw new HttpException({
-				"success": false,
-				"message": "존재하지 않는 위키입니다."
+				success: false,
+				message: "존재하지 않는 위키입니다."
 			}, HttpStatus.NOT_FOUND);
 		}
 
 		return {
-			"success": true,
+			success: true,
 			"data": wiki.content
 		};
 
@@ -128,17 +128,26 @@ export class WikiService {
 		const user = await this.userService.findOneByName(name);
 		if (user) {
 
+			const currentDate = new Date(Date.now());
 			const newWiki = this.wikiRepository.create({
 				owner: user,
 				value: "제목",
-				hd: name + Date.now().toString()
+				hd: name + Date.now().toString(),
+				createdAt: currentDate,
+				updatedAt: currentDate
 			});
 			
 			await this.wikiRepository.save(newWiki);
 
 			return {
-				"success": true,
-				"data": newWiki
+				success: true,
+				"data": {
+					id: newWiki.id,
+					value: newWiki.value,
+					hd: newWiki.hd,
+					createdAt: newWiki.createdAt,
+					updatedAt: newWiki.updatedAt
+				}
 			}
 		}
 	}
@@ -149,8 +158,8 @@ export class WikiService {
 		const wiki = user?.wiki.find(wiki => wiki.id === body.id);
 		if (!wiki) {
 			throw new HttpException({
-				"success": false,
-				"message": "존재하지 않는 위키입니다."
+				success: false,
+				message: "존재하지 않는 위키입니다."
 			}, HttpStatus.NOT_FOUND)
 		}
 
@@ -159,11 +168,24 @@ export class WikiService {
 
 		if (body.content)
 			wiki.content = body.content;
+		
+		const current = new Date(Date.now());
+		wiki.updatedAt = current;
 
 		await this.wikiRepository.save(wiki);
 
+		for (const connect of body.connectQueue) {
+			await this.connect(name, connect.source, connect.target);
+		}
+
+		for (const disconnect of body.disconnectQueue) {
+			await this.disconnect(name, disconnect.source, disconnect.target);
+		}
+
+
 		return {
-			success: true
+			success: true,
+			data: current
 		}
 	}
 
@@ -173,8 +195,8 @@ export class WikiService {
 
 		if (!wiki) {
 			throw new HttpException({
-				"success": false,
-				"message": "존재하지 않는 위키입니다."
+				success: false,
+				message: "존재하지 않는 위키입니다."
 			}, HttpStatus.NOT_FOUND)
 		}
 		await this.wikiRepository.remove(wiki);
@@ -188,12 +210,12 @@ export class WikiService {
 
 		if (!sourceWiki || !targetWiki) {
 			throw new HttpException({
-				"success": false,
-				"message": "존재하지 않는 위키입니다."
+				success: false,
+				message: "존재하지 않는 위키입니다."
 			}, HttpStatus.NOT_FOUND);
 		}
 
-		
+
 		const ref = await this.wikiRefRepository.findOne({
 			where: {
 				source: sourceWiki,
@@ -202,10 +224,8 @@ export class WikiService {
 		});
 
 		if (ref) {
-			return {
-				"success": true
-			}
-		};
+			return;
+		}
 
 		const newRef = this.wikiRefRepository.create({
 			source: sourceWiki,
@@ -213,9 +233,6 @@ export class WikiService {
 		});
 
 		await this.wikiRefRepository.save(newRef);
-		return {
-			"success": true
-		}
 	}
 
 	async disconnect(name: string, source: number, target: number) {

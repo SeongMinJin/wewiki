@@ -1,19 +1,29 @@
 'use client'
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { ToastContainer } from "react-toastify"
 import { useRouter } from "next/navigation"
 import Graph from "./components/graph"
 import 'react-toastify/dist/ReactToastify.css';
 import dynamic from "next/dynamic"
 import { ToastWraper } from "../components/main"
-const Note = dynamic(() => import('./components/note'), {
+const Note = dynamic(async () => {
+	const { default: Quill } = await import('quill');
+
+	// @ts-ignore
+	const { default: imageResize } = await import("quill-image-resize");
+	Quill.register("modules/imageResize", imageResize);
+
+	return await import('./components/note');
+}, {
 	ssr: false,
 })
 
 export interface Wiki {
 	id: number;
 	value: string;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 export interface Relation {
@@ -23,14 +33,16 @@ export interface Relation {
 
 export default function Write() {
 	const [currentWiki, setCurrentWiki] = useState<Wiki | null>(null);
+	const [disableDeleteButton, setDisableDeleteButton] = useState<boolean>(false);
 	const _createWiki = useRef<() => Promise<void>>();
 	const _saveWiki = useRef<(id: number, body: { value?: string, content?: any }) => Promise<void>>();
 	const _deleteWiki = useRef<(id: number) => Promise<void>>();
 	const _connectWiki = useRef<(target: number, source: number) => Promise<void>>();
 	const _disconnectWiki = useRef<(target: number, source: number) => Promise<void>>();
 	const _wikies = useRef<Wiki[]>([]);
+	const _connectQueue = useRef<Relation[]>([]);
+	const _disconnectQueue = useRef<Relation[]>([]);
 	const timerId = useRef<Map<number, NodeJS.Timeout>>(new Map<number, NodeJS.Timeout>());
-
 	const router = useRouter();
 
 	return (
@@ -60,10 +72,11 @@ export default function Write() {
 							}} className="w-full font-noto font-semibold p-4 text-[230%] focus:outline-none" type="text" placeholder={`제목을 써주세요.`} />
 							<div className="w-full p-4">
 								<div className="mb-4 bg-black bg-opacity-70 w-16 h-[6px]"></div>
+								<p className="italic text-s opacity-40" ><span className="font-bold">Updated </span>{currentWiki.updatedAt ? `${new Date(currentWiki.updatedAt).getFullYear()}년 ${new Date(currentWiki.updatedAt).getMonth() + 1}월 ${new Date(currentWiki.updatedAt).getDate()}일 ${new Date(currentWiki.updatedAt).getHours()}시 ${new Date(currentWiki.updatedAt).getMinutes()}분` : ""}</p>
 							</div>
 
 							{/* <Note currentWiki={currentWiki} _saveWiki={_saveWiki} /> */}
-							<Note currentWiki={currentWiki} setCurrentWiki={setCurrentWiki} _saveWiki={_saveWiki} _connectWiki={_connectWiki} _disconnectWiki={_disconnectWiki} _wikies={_wikies}/>
+							<Note setDisableDeleteButton={setDisableDeleteButton} currentWiki={currentWiki} setCurrentWiki={setCurrentWiki} _saveWiki={_saveWiki} _connectWiki={_connectWiki} _disconnectWiki={_disconnectWiki} _wikies={_wikies}/>
 							
 
 							
@@ -72,7 +85,7 @@ export default function Write() {
 									⬅ 나가기
 								</button>
 								<div className="flex gap-x-4">
-									<button className="px-4 py-2 text-white bg-red-500 rounded-md whitespace-nowrap hover:bg-opacity-80" onClick={() => _deleteWiki.current?.(currentWiki.id)}>
+									<button disabled={disableDeleteButton} className="px-4 py-2 text-white bg-red-500 rounded-md disabled:bg-gray-400 whitespace-nowrap hover:bg-opacity-80" onClick={() => _deleteWiki.current?.(currentWiki.id)}>
 										삭제하기
 									</button>
 								</div>
@@ -97,7 +110,7 @@ export default function Write() {
 						</div>
 				}
 				<div className="relative hidden w-full h-screen tablet:block">
-					<Graph _createWiki={_createWiki} _saveWiki={_saveWiki} _deleteWiki={_deleteWiki} _disconnectWiki={_disconnectWiki} setCurrentWiki={setCurrentWiki} _connectWiki={_connectWiki} _wikies={_wikies}/>
+					<Graph setDisableDeleteButton={setDisableDeleteButton} currentWiki={currentWiki} _connectQueue={_connectQueue} _disconnectQueue={_disconnectQueue}  _createWiki={_createWiki} _saveWiki={_saveWiki} _deleteWiki={_deleteWiki} _disconnectWiki={_disconnectWiki} setCurrentWiki={setCurrentWiki} _connectWiki={_connectWiki} _wikies={_wikies}/>
 				</div>
 			</div>
 			<ToastContainer

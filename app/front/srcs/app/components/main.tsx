@@ -5,7 +5,7 @@ import Login from "./login";
 import Section from "./section"
 import { useContext, useEffect } from "react";
 import { StateContext, StateDispatchContext } from "../state";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer, toast, Flip } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { redirect } from "next/navigation";
 
@@ -24,6 +24,11 @@ export default function Main() {
 			if (!res.success) {
 				return;
 			}
+
+			if (!res.data.user) {
+				return;
+			}
+
 			dispatch({type: "login"});
 
 		} catch (err) {
@@ -67,36 +72,39 @@ export function ToastWraper(type: string, message: string, path: string | null =
 		case "error":
 			return toast.error(message, {
 				position: "top-right",
-				autoClose: 3000,
+				autoClose: 1500,
+				transition: Flip,
 				hideProgressBar: false,
 				closeOnClick: true,
 				pauseOnHover: true,
 				draggable: true,
 				progress: undefined,
-				theme: "colored",
+				theme: "dark",
 				onClose: () => {path ? redirect(path) : null}
 			})
 		case "warn":
 			return toast.warn(message, {
 				position: "top-right",
-				autoClose: 3000,
+				autoClose: 1500,
+				transition: Flip,
 				hideProgressBar: false,
 				closeOnClick: true,
 				pauseOnHover: true,
 				draggable: true,
 				progress: undefined,
-				theme: "colored",
+				theme: "dark",
 			})
 		case "success":
 			return toast.success(message, {
 				position: "top-right",
-				autoClose: 3000,
+				autoClose: 1500,
+				transition: Flip,
 				hideProgressBar: false,
 				closeOnClick: true,
 				pauseOnHover: true,
 				draggable: true,
 				progress: undefined,
-				theme: "colored",
+				theme: "dark",
 			})
 		default:
 			return;
