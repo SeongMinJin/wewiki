@@ -24,6 +24,7 @@ services:
 
   nginx:
     build: /home/wewiki/app/nginx
+    tty: true
     ports:
       - 80:80
       - 443:443
