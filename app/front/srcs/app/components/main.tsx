@@ -25,14 +25,14 @@ export default function Main() {
 				return;
 			}
 
-			if (!res.data.user) {
+			if (!res.user) {
 				return;
 			}
 
 			dispatch({type: "login"});
 
 		} catch (err) {
-			console.log(err);
+			ToastWraper("error", "서버가 아파요 :(");
 		}
 
 	}

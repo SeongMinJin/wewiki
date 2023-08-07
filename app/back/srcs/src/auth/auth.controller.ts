@@ -13,7 +13,6 @@ export class AuthController {
 		private authService: AuthService,
 	) { }
 
-
 	@HttpCode(200)
 	@UseGuards(LocalAuthGuard)
 	@Post('signin')
