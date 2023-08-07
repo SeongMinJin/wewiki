@@ -29,6 +29,21 @@ services:
       - 443:443
     networks:
       - wewiki_network
+    volumes:
+      - /home/wewiki/app/certbot/conf:/etc/letencrypt
+      - /home/wewiki/app/certbot/www:/var/www/certbot
+      - /home/wewiki/app/certbot/logs:/var/log/letsencrypt
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    restart: always
+    volumes:
+      - /home/wewiki/app/certbot/conf:/etc/letencrypt
+      - /home/wewiki/app/certbot/www:/var/www/certbot
+      - /home/wewiki/app/certbot/logs:/var/log/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
 
 networks:
   wewiki_network: {}
